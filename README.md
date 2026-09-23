@@ -168,11 +168,12 @@ NEXT: Implement user registration and login endpoints.
 
 ## 6. Command System
 
-AI-Chief includes 7 built-in text commands:
+AI-Chief includes 8 built-in text commands:
 
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| `/chief` | `/chief [request]` | Activates AI-Chief mode, loads `SKILL.md`, and initiates work. |
+| `/chief` | `/chief [request]` | Normal activation. Loads framework files from disk and initiates work. |
+| `/chief+` | `/chief+ [request]` | Full reload. Forces cold-start resync when context is degraded or compressed. |
 | `/chief-status` | `/chief-status` | Returns a concise overview of current project state and task list. |
 | `/chief-plan` | `/chief-plan [goal]` | Decomposes a goal into a proposed task list without executing code. |
 | `/chief-build` | `/chief-build [task]` | Authorizes Manager to dispatch Worker agents to execute changes. |
@@ -182,22 +183,31 @@ AI-Chief includes 7 built-in text commands:
 
 ---
 
-## 7. Memory Architecture
+## 7. Memory Architecture (Filesystem-First)
+
+> **Core Principle:** *The conversation is temporary. The filesystem is the source of truth.*
 
 ```
-Permanent (Never compressed or deleted)
-├── Agent instructions (agents/)
+Tier 1: Immutable Instructions (Never compressed or deleted)
+├── SKILL.md (Entry point)
+├── AGENTS.md (Root governance)
+├── Agent definitions (agents/chief.md, manager.md, worker.md, cleaner.md)
+└── Communication protocols (protocols/)
+
+Tier 2: Persistent Knowledge (Survives sessions & platform switches)
 ├── User preferences (memory/chief/preferences.md)
-└── Architecture decisions (memory/manager/decisions.md)
+├── Architecture decisions (memory/manager/decisions.md)
+├── Project state & milestones (memory/manager/project_state.md)
+└── Project overview (memory/project/overview.md)
 
-Compressible (Periodically compacted by Cleaner & Manager)
-├── Old conversations (memory/chief/conversation_state.md)
-├── Worker reports (absorbed by Manager)
-└── Completed tasks / logs (memory/manager/active_tasks.md)
-
-Temporary (Ephemeral staging)
+Tier 3: Temporary Context (Only this tier may be compressed)
+├── Active conversations (memory/chief/conversation_state.md)
+├── Worker reports (compressed by Manager into high-signal summaries)
+├── Temporary logs & closed tasks (memory/manager/active_tasks.md)
 └── Staging task files (runtime/tasks/) — safe to purge via /chief-reset
 ```
+
+See [`protocols/memory_rules.md`](file:///home/ishaan/Work/ai-chief/protocols/memory_rules.md) and [`docs/persistent-context.md`](file:///home/ishaan/Work/ai-chief/docs/persistent-context.md) for details.
 
 ---
 
@@ -208,6 +218,7 @@ ai-chief/
 ├── AGENTS.md                                # Root directives, governance, and command mapping
 ├── README.md                                # Full framework overview, lifecycle, and command table
 ├── SKILL.md                                 # Skill guide with command triggers and agent contracts
+├── LICENSE                                  # MIT License
 │
 ├── agents/                                  # Agent personas and operational contracts
 │   ├── chief.md                             # Human interface (<10 sentences, non-coding)
@@ -234,10 +245,12 @@ ai-chief/
 │       └── README.md
 │
 ├── protocols/                               # Rigid inter-agent communication specifications
-│   ├── commands.md                          # Portable command protocol (/chief, /chief-plan, etc.)
+│   ├── activation.md                        # Persistent activation & 6-step bootstrap protocol
+│   ├── context_recovery.md                  # Self-healing reload triggers & /chief+
+│   ├── commands.md                          # Portable command protocol (/chief, /chief+, etc.)
 │   ├── delegation.md                        # Manager ↔ Worker and Manager ↔ Chief contracts
 │   ├── compression.md                       # Output compression algorithms and boundaries
-│   ├── memory_rules.md                      # Permanent, Compressible, Temporary storage rules
+│   ├── memory_rules.md                      # 3-tier memory durability hierarchy rules
 │   └── response_format.md                   # Exact output schemas across all tiers
 │
 ├── templates/                               # Operational Markdown templates
@@ -252,6 +265,7 @@ ai-chief/
     ├── README.md                            # Documentation index
     ├── quick-start.md                       # 5-minute onboarding guide
     ├── user-guide.md                        # Comprehensive user guide
+    ├── persistent-context.md                # Chat truncation survival & recovery guide
     ├── lifecycle.md                         # 7-stage execution lifecycle guide
     ├── commands.md                          # User commands & cross-tool integration guide
     ├── fallback-mode.md                     # Single-agent fallback operating instructions

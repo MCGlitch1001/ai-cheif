@@ -50,12 +50,17 @@ Let's walk through an end-to-end user request:
 
 ## 4. Complete Command Reference
 
-AI-Chief provides 7 commands that work consistently across all AI tools:
+AI-Chief provides 8 commands that work consistently across all AI tools:
 
 ### `/chief [request]`
-- **Description:** Activates AI-Chief mode and initiates work.
-- **When to use:** Starting a project or assigning a new development goal.
+- **Description:** Normal AI-Chief activation. Loads framework files from disk and initiates work.
+- **When to use:** Starting a project, session, or assigning a new development goal.
 - **Example:** `/chief set up Tailwind CSS and configure dark mode`
+
+### `/chief+ [request]`
+- **Description:** Full framework reload. Forces a complete cold-start reload of all instructions, protocols, and memory files from disk.
+- **When to use:** In long conversations, when context compression occurs, or if the AI forgets its persona/rules.
+- **Example:** `/chief+ refactor the authentication layer`
 
 ### `/chief-status`
 - **Description:** Returns a snapshot of the current milestone and active tasks.

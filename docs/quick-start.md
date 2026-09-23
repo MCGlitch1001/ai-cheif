@@ -59,7 +59,8 @@ If using Google Antigravity, Claude Code, or Cursor, tell your assistant:
 
 | Command | Action |
 | :--- | :--- |
-| `/chief [goal]` | Start working on a goal |
+| `/chief [goal]` | Normal activation (loads filesystem rules) |
+| `/chief+ [goal]` | Force full reload (recovers degraded context) |
 | `/chief-status` | See what the team is doing |
 | `/chief-plan [goal]` | Plan without touching code |
 | `/chief-build [task]` | Execute code modifications |

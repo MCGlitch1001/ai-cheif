@@ -3,52 +3,64 @@
 ## 1. Core Architectural Tenet
 All memory in AI-Chief is persisted solely in human-readable, Git-versioned Markdown files within the `memory/` directory tree and staging areas in `runtime/tasks/`. There are zero databases, key-value stores, or external microservices.
 
+**The conversation is temporary. The filesystem is the source of truth.**
+
 ---
 
-## 2. Memory Tier Classification
+## 2. The 3-Tier Memory Hierarchy
 
-AI-Chief establishes three distinct tiers of data durability:
+AI-Chief establishes a rigid 3-tier memory durability hierarchy:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                      PERMANENT MEMORY                       │
-│ - Agent instructions (agents/)                              │
+│              TIER 1: IMMUTABLE INSTRUCTIONS                 │
+│ - SKILL.md                                                  │
+│ - AGENTS.md                                                 │
+│ - Agent definitions (agents/chief.md, manager.md, etc.)     │
+│ ──► NEVER COMPRESSED OR MODIFIED DURING SESSIONS            │
+├─────────────────────────────────────────────────────────────┤
+│              TIER 2: PERSISTENT KNOWLEDGE                   │
+│ - Project state (memory/manager/project_state.md)           │
+│ - Architectural decisions (memory/manager/decisions.md)     │
 │ - User preferences (memory/chief/preferences.md)            │
-│ - Architecture decisions (memory/manager/decisions.md)      │
-│ ──► NEVER COMPRESSED OR DELETED                             │
+│ - Project overview (memory/project/overview.md)             │
+│ ──► PERSISTS ACROSS SESSIONS & TOOL SWITCHES                │
 ├─────────────────────────────────────────────────────────────┤
-│                    COMPRESSIBLE MEMORY                      │
-│ - Old conversations (memory/chief/conversation_state.md)    │
-│ - Worker execution reports (ingested by Manager)            │
-│ - Temporary logs & task lists (memory/manager/active_tasks) │
-│ ──► PERIODICALLY COMPACTED BY MANAGER & CLEANER             │
-├─────────────────────────────────────────────────────────────┤
-│                     TEMPORARY MEMORY                        │
-│ - Staging files in runtime/tasks/                           │
-│ ──► PURGED AFTER TASK INTEGRATION OR VIA /chief-reset       │
+│              TIER 3: TEMPORARY CONTEXT                      │
+│ - Active conversations (memory/chief/conversation_state.md) │
+│ - Worker execution logs & raw diffs                         │
+│ - Ephemeral runtime tasks (runtime/tasks/task-*.md)         │
+│ ──► ONLY TIER 3 MAY DISAPPEAR DURING CONTEXT COMPRESSION    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
+> [!IMPORTANT]
+> **Compression Invariant:** ONLY Tier 3 may disappear or undergo lossy compression during context truncation or session resets. Tier 1 and Tier 2 must always be restored from the filesystem.
+
 ---
 
-## 3. Memory Zone Breakdown
+## 3. Tier Detailed Breakdown
 
-### 3.1 Permanent Memory (Zero-Loss Immutables)
-These files represent system law, user constraints, and core architectural records.
-- **Agent Instructions (`agents/`):** [`chief.md`](file:///home/ishaan/Work/ai-chief/agents/chief.md), [`manager.md`](file:///home/ishaan/Work/ai-chief/agents/manager.md), [`worker.md`](file:///home/ishaan/Work/ai-chief/agents/worker.md), [`cleaner.md`](file:///home/ishaan/Work/ai-chief/agents/cleaner.md).
-- **User Preferences:** [`memory/chief/preferences.md`](file:///home/ishaan/Work/ai-chief/memory/chief/preferences.md) (Tone, response length, guidelines).
-- **Architecture Decisions (ADRs):** [`memory/manager/decisions.md`](file:///home/ishaan/Work/ai-chief/memory/manager/decisions.md) (All technical decisions must remain intact for future reference).
-- **Project Overview:** [`memory/project/overview.md`](file:///home/ishaan/Work/ai-chief/memory/project/overview.md) (Core domain context and stack definition).
+### Tier 1: Immutable Instructions (System Law)
+These files govern agent behavior, role constraints, and communication protocols. They are defined statically in the repository:
+- **Root Governance:** [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md)
+- **Framework Entry Point:** [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md)
+- **Agent Prompts:** [`agents/chief.md`](file:///home/ishaan/Work/ai-chief/agents/chief.md), [`agents/manager.md`](file:///home/ishaan/Work/ai-chief/agents/manager.md), [`agents/worker.md`](file:///home/ishaan/Work/ai-chief/agents/worker.md), [`agents/cleaner.md`](file:///home/ishaan/Work/ai-chief/agents/cleaner.md)
+- **Protocols:** All files in [`protocols/`](file:///home/ishaan/Work/ai-chief/protocols/)
 
-### 3.2 Compressible Memory (Targeted Compaction)
-These files capture operational history and may be condensed when context thresholds are reached:
-- **Old Conversations:** [`memory/chief/conversation_state.md`](file:///home/ishaan/Work/ai-chief/memory/chief/conversation_state.md) is consolidated into high-level summary paragraphs when older than 5 conversation turns.
-- **Worker Reports:** Verbose reports from workers (compiler output, test dumps) are absorbed by Manager, stripped of noise, and condensed into 4-line status records.
-- **Temporary Logs & Task Lists:** Completed tasks in [`memory/manager/active_tasks.md`](file:///home/ishaan/Work/ai-chief/memory/manager/active_tasks.md) are consolidated into milestone bullet points.
+### Tier 2: Persistent Knowledge (Long-Term Memory)
+These files store permanent facts, user specifications, and project architectural decisions. They survive across different AI tools, context window purges, and project months:
+- **User Preferences:** [`memory/chief/preferences.md`](file:///home/ishaan/Work/ai-chief/memory/chief/preferences.md) (Tone, constraints, language).
+- **Decisions (ADRs):** [`memory/manager/decisions.md`](file:///home/ishaan/Work/ai-chief/memory/manager/decisions.md) (Append-only record of choices and rationales).
+- **Project State:** [`memory/manager/project_state.md`](file:///home/ishaan/Work/ai-chief/memory/manager/project_state.md) (Current architecture, stack, milestones).
+- **Project Overview:** [`memory/project/overview.md`](file:///home/ishaan/Work/ai-chief/memory/project/overview.md) (Core purpose, constraints).
 
-### 3.3 Temporary Memory (Ephemeral Staging)
-- **Runtime Task Files:** [`runtime/tasks/`](file:///home/ishaan/Work/ai-chief/runtime/tasks/) contains single-task instructions (`task-<id>.md`) used exclusively during active worker execution.
-- Once completed and incorporated into `project_state.md`, these files can be safely deleted manually, via `/chief-reset`, or by the Cleaner Agent.
+### Tier 3: Temporary Context (Ephemeral Working Memory)
+These files represent in-flight progress and disposable artifacts. They are expected to be pruned, compacted, or discarded:
+- **Conversation State:** [`memory/chief/conversation_state.md`](file:///home/ishaan/Work/ai-chief/memory/chief/conversation_state.md) (Compacted into high-level summaries).
+- **Worker Execution Reports:** Absorbed and compressed by Manager into high-signal summaries.
+- **Active Task Registry:** Closed tasks in [`memory/manager/active_tasks.md`](file:///home/ishaan/Work/ai-chief/memory/manager/active_tasks.md) compacted into milestone bullets.
+- **Runtime Tasks:** Ephemeral files in [`runtime/tasks/`](file:///home/ishaan/Work/ai-chief/runtime/tasks/) purged upon completion or via `/chief-reset`.
 
 ---
 
@@ -64,6 +76,7 @@ Memory maintenance is triggered when any of the following occur:
 
 ## 5. Sanitization Safeguards
 When Cleaner executes:
-1. It **must** verify that `preferences.md` and `decisions.md` have not been altered or deleted.
-2. It **must not** delete tasks currently marked `IN_PROGRESS` or `QUEUED`.
-3. It **must** write an audit entry summarizing lines freed, duplicate entries removed, and files archived.
+1. It **must** verify that `preferences.md` and `decisions.md` (Tier 2) remain intact.
+2. It **must not** modify or delete any Tier 1 file under any circumstance.
+3. It **must not** delete tasks currently marked `IN_PROGRESS` or `QUEUED`.
+4. It **must** write an audit entry summarizing lines freed, duplicate entries removed, and files archived.

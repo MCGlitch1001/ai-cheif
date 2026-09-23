@@ -43,11 +43,12 @@ All operations within this repository and any project governed by AI-Chief must 
 
 ---
 
-## 3. Command System
+## 3. Command System & Activation
 
-AI-Chief provides a standardized, text-based command protocol defined in [`protocols/commands.md`](file:///home/ishaan/Work/ai-chief/protocols/commands.md):
+AI-Chief operates on the golden rule: **The conversation is temporary. The filesystem is the source of truth.** All interactions must use the standardized command protocol defined in [`protocols/commands.md`](file:///home/ishaan/Work/ai-chief/protocols/commands.md) and [`protocols/activation.md`](file:///home/ishaan/Work/ai-chief/protocols/activation.md):
 
-- `/chief [request]`: Activates AI-Chief mode, applies Chief persona, and initiates work.
+- `/chief [request]`: Normal activation. Triggers 6-step filesystem bootstrap and starts Chief mode.
+- `/chief+ [request]`: Full framework reload. Forces complete filesystem resync after context compression.
 - `/chief-status`: Returns current project state and progress snapshot from memory.
 - `/chief-clean`: Activates Cleaner Agent to review memory, deduplicate, and archive outdated data.
 - `/chief-memory`: Displays stored project overview, preferences, and architecture decisions.
