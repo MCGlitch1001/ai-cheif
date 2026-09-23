@@ -74,23 +74,42 @@ Monolithic AI coding agents suffer from two systemic issues:
 
 ---
 
-## 3. Installation Methods
+## Install AI-Chief
 
-AI-Chief requires **no node modules, no python environments, and no hosted servers**. Choose the method that best matches your setup:
+New users should not manually configure files.
 
-### Method 1: Clone Repository into a Project
+### 1-Line Installation Flow:
+1. **Paste the installer prompt into your AI coding tool:**
+   ```text
+   Install AI-Chief into this project.
+   ```
+2. **AI installs AI-Chief:** The AI assistant reads [`install.md`](file:///home/ishaan/Work/ai-chief/install.md), scaffolds the directory structure, initializes memory, and confirms with the standard onboarding summary.
+3. **Use immediately:**
+   ```text
+   /chief <your task>
+   ```
+
+*(See [`install.md`](file:///home/ishaan/Work/ai-chief/install.md) and [`docs/installation.md`](file:///home/ishaan/Work/ai-chief/docs/installation.md) for complete details.)*
+
+---
+
+### Alternative Manual Installation Methods
+
+AI-Chief requires **no node modules, no python environments, and no hosted servers**. If preferred, you can also install manually:
+
+#### Method 1: Clone Repository into a Project
 Clone AI-Chief directly into your existing project or workspace:
 ```bash
 git clone https://github.com/MCGlitch1001/ai-cheif.git .ai-chief
 ```
 
-### Method 2: Copy `ai-chief` Folder into an Existing Project
+#### Method 2: Copy `ai-chief` Folder into an Existing Project
 Copy the `ai-chief/` directory directly into the root of your existing codebase:
 ```bash
 cp -r /path/to/ai-chief /path/to/your-project/ai-chief
 ```
 
-### Method 3: Point an AI Tool to `SKILL.md`
+#### Method 3: Point an AI Tool to `SKILL.md`
 If you are using an AI coding tool that supports skill or rule loading (Google Antigravity, Claude Code, Cursor, Windsurf):
 - Point your assistant to [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) or [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md).
 - In Antigravity: Placed automatically in your workspace skills.
@@ -219,6 +238,7 @@ ai-chief/
 ├── README.md                                # Full framework overview, lifecycle, and command table
 ├── SKILL.md                                 # Skill guide with command triggers and agent contracts
 ├── LICENSE                                  # MIT License
+├── install.md                               # Automated 1-line installation specification
 │
 ├── agents/                                  # Agent personas and operational contracts
 │   ├── chief.md                             # Human interface (<10 sentences, non-coding)
@@ -263,6 +283,8 @@ ai-chief/
 │
 └── docs/                                    # Documentation library
     ├── README.md                            # Documentation index
+    ├── installation.md                      # 1-line installation guide & safety rules
+    ├── first-run.md                         # First run experience & lifecycle walkthrough
     ├── quick-start.md                       # 5-minute onboarding guide
     ├── user-guide.md                        # Comprehensive user guide
     ├── persistent-context.md                # Chat truncation survival & recovery guide

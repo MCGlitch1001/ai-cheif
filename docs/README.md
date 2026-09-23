@@ -3,13 +3,17 @@
 Welcome to the AI-Chief framework documentation library (v0.3).
 
 ## 🚀 Getting Started & Guides
-1. [5-Minute Quick Start](file:///home/ishaan/Work/ai-chief/docs/quick-start.md)
+1. [Installation Guide](file:///home/ishaan/Work/ai-chief/docs/installation.md)
+   - 1-line installation prompt, automated setup flow, and safety guarantees.
+2. [First Run Experience](file:///home/ishaan/Work/ai-chief/docs/first-run.md)
+   - Step-by-step walkthrough of what happens on your very first `/chief` task.
+3. [5-Minute Quick Start](file:///home/ishaan/Work/ai-chief/docs/quick-start.md)
    - Fastest path to understanding and trying AI-Chief.
-2. [Complete User Guide](file:///home/ishaan/Work/ai-chief/docs/user-guide.md)
+4. [Complete User Guide](file:///home/ishaan/Work/ai-chief/docs/user-guide.md)
    - In-depth manual covering activation, core lifecycle, and all commands.
-3. [Persistent Context Guide](file:///home/ishaan/Work/ai-chief/docs/persistent-context.md)
+5. [Persistent Context Guide](file:///home/ishaan/Work/ai-chief/docs/persistent-context.md)
    - Why chat history cannot be trusted and how AI-Chief survives conversation compression.
-4. [Fallback Mode Guide](file:///home/ishaan/Work/ai-chief/docs/fallback-mode.md)
+6. [Fallback Mode Guide](file:///home/ishaan/Work/ai-chief/docs/fallback-mode.md)
    - Operating instructions for single-agent conversation environments using structured role switching.
 
 ## 🏗️ Architecture & Protocols
