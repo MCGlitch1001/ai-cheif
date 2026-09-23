@@ -21,7 +21,7 @@ Choose the installation method that fits your workflow:
 
 ### Option A: Clone into your repository
 ```bash
-git clone https://github.com/your-username/ai-chief.git .ai-chief
+git clone https://github.com/MCGlitch1001/ai-cheif.git .ai-chief
 ```
 
 ### Option B: Copy into existing project

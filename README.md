@@ -2,7 +2,7 @@
 
 > **A portable, tool-agnostic AI agent orchestration framework and communication layer between humans and AI workers.**
 
-[![Version](https://img.shields.io/badge/version-v0.3.0-blue.svg)](https://github.com/your-username/ai-chief)
+[![Version](https://img.shields.io/badge/version-v0.3.0-blue.svg)](https://github.com/MCGlitch1001/ai-cheif)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](file:///home/ishaan/Work/ai-chief/LICENSE)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Markdown)-brightgreen.svg)](#installation-methods)
 [![Architecture](https://img.shields.io/badge/architecture-3--Tier%20Stratified-orange.svg)](file:///home/ishaan/Work/ai-chief/docs/architecture.md)
@@ -81,7 +81,7 @@ AI-Chief requires **no node modules, no python environments, and no hosted serve
 ### Method 1: Clone Repository into a Project
 Clone AI-Chief directly into your existing project or workspace:
 ```bash
-git clone https://github.com/your-username/ai-chief.git .ai-chief
+git clone https://github.com/MCGlitch1001/ai-cheif.git .ai-chief
 ```
 
 ### Method 2: Copy `ai-chief` Folder into an Existing Project
