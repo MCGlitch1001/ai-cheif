@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI-Chief — Opt-in AI behavior for focused, direct responses</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card-bg: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --btn-bg: #21262d;
+      --btn-hover: #30363d;
+      --btn-success: #238636;
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 680px;
+      width: 100%;
+    }
+
+    header {
+      margin-bottom: 32px;
+    }
+
+    h1 {
+      color: var(--text-bright);
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      margin-bottom: 24px;
+    }
+
+    .diagram {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px 20px;
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--text-bright);
+      line-height: 1.5;
+      margin-bottom: 28px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+
+    .workflow {
+      border-left: 2px solid var(--accent);
+      padding-left: 16px;
+      margin-bottom: 32px;
+      font-size: 1rem;
+      color: var(--text-bright);
+    }
+
+    .workflow p {
+      margin-bottom: 6px;
+    }
+
+    .workflow p:last-child {
+      margin-bottom: 0;
+      color: var(--text-muted);
+    }
+
+    .section-title {
+      color: var(--text-bright);
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .prompt-container {
+      position: relative;
+      margin-bottom: 36px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background-color: var(--btn-bg);
+      color: var(--text-bright);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-family: var(--font-sans);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+      z-index: 10;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--btn-hover);
+      border-color: var(--text-muted);
+    }
+
+    .copy-btn.copied {
+      background-color: var(--btn-success);
+      border-color: var(--btn-success);
+      color: #ffffff;
+    }
+
+    pre.code-box {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 16px;
+      padding-top: 48px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text);
+      line-height: 1.5;
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-x: auto;
+    }
+
+    .example-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+
+    .example-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+    }
+
+    .example-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    .example-prompt {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      color: var(--text-bright);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>AI-Chief</h1>
+      <p class="tagline">Opt-in AI behavior for focused, direct responses.</p>
+    </header>
+
+    <div class="diagram">Normal prompt
+    &darr;
+Normal AI
+
+/chief + prompt
+    &darr;
+AI-Chief behavior</div>
+
+    <div class="workflow">
+      <p>1. Add AI-Chief to your system prompt once.</p>
+      <p>2. Type <code>/chief</code> whenever you want direct, high-signal results.</p>
+      <p>3. Leave it out when you don't. That's it.</p>
+    </div>
+
+    <section>
+      <h2 class="section-title">Add this to your system prompt:</h2>
+      <div class="prompt-container">
+        <button class="copy-btn" id="copyBtn" onclick="copyPrompt()">Copy Prompt</button>
+        <pre class="code-box" id="promptText"># AI-Chief: System Prompt Directives
+
+> **System Instruction:**
+> This block is installed in your system prompt to establish an on-demand, opt-in operational mode.
+> The directives below apply **ONLY** when the user's message explicitly begins with `/chief`.
+> If a message does NOT begin with `/chief`, ignore these directives entirely and respond normally according to your existing system prompt, personality, tools, and instructions.
+
+## Rules for `/chief` Requests:
+
+1. Direct Execution & Completeness
+- Perform the requested work directly and completely rather than describing what could be done.
+- Provide the actual deliverable, answer, or code. Do not use placeholders, hand-waving, or partial snippets.
+
+2. Conciseness & High Signal
+- Deliver direct, high-signal responses. Eliminate pleasantries, conversational filler, and preambles.
+- Answer the prompt directly without repeating the question or stating the obvious.
+
+3. Deliberate Reasoning & Internal Thinking
+- Think through requirements, constraints, edge cases, and implications before generating output.
+- Keep reasoning internal: do not expose raw chain-of-thought, scratchpads, or self-narration unless explicitly asked.
+
+4. Context & Grounding
+- Anchor answers in provided files, materials, tools, and explicit facts rather than conversational assumptions.
+- Use available tools and resources effectively to verify accuracy, correctness, and logic before finalizing output.
+
+5. Strict Instruction Fidelity
+- Follow the user's explicit requirements precisely.
+- Avoid unsolicited status updates, self-congratulations, or meta-commentary about your process.
+- Preserve all existing identity, domain knowledge, capabilities, safety rules, and tools seamlessly.</pre>
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Example</h2>
+      <div class="example-grid">
+        <div class="example-card">
+          <div class="example-label">Normal</div>
+          <div class="example-prompt">Explain Kubernetes.</div>
+        </div>
+        <div class="example-card">
+          <div class="example-label">AI-Chief</div>
+          <div class="example-prompt">/chief Explain Kubernetes.</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>MIT License &bull; Zero dependencies</span>
+      <a href="https://github.com/MCGlitch1001/ai-cheif">GitHub Repository</a>
+    </footer>
+  </div>
+
+  <script>
+    function copyPrompt() {
+      const text = document.getElementById('promptText').innerText;
+      const btn = document.getElementById('copyBtn');
+
+      navigator.clipboard.writeText(text).then(() => {
+        btn.innerText = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerText = 'Copy Prompt';
+          btn.classList.remove('copied');
+        }, 2000);
+      }).catch(err => {
+        // Fallback for older browsers
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        btn.innerText = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerText = 'Copy Prompt';
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+  </script>
+</body>
+</html>
