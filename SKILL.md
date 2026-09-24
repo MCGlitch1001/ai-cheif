@@ -73,6 +73,8 @@ When `/chief [task]` is detected:
 ---
 
 ## Documentation Quick Links
+- [Installation Guide](file:///home/ishaan/Work/ai-chief/docs/installation.md)
+- [Platform Compatibility](file:///home/ishaan/Work/ai-chief/docs/platforms.md)
 - [Persistent Context Guide](file:///home/ishaan/Work/ai-chief/docs/persistent-context.md)
 - [Activation Protocol](file:///home/ishaan/Work/ai-chief/protocols/activation.md)
 - [Context Recovery Protocol](file:///home/ishaan/Work/ai-chief/protocols/context_recovery.md)

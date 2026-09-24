@@ -284,6 +284,7 @@ ai-chief/
 └── docs/                                    # Documentation library
     ├── README.md                            # Documentation index
     ├── installation.md                      # 1-line installation guide & safety rules
+    ├── platforms.md                         # Cross-platform compatibility & verification matrix
     ├── first-run.md                         # First run experience & lifecycle walkthrough
     ├── quick-start.md                       # 5-minute onboarding guide
     ├── user-guide.md                        # Comprehensive user guide
