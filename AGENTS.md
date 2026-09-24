@@ -1,7 +1,7 @@
 # AI-Chief: Project Directives & Governance
 
 ## 1. System Identity & Mission
-AI-Chief is a **portable system-prompt framework** designed to make AI coding assistants more focused, concise, actionable, and consistent.
+AI-Chief is a **portable system-prompt framework** designed to make AI assistants more focused, concise, actionable, and consistent.
 
 AI-Chief is centered entirely around **TWO simple products**:
 1. **Mode 1 — AI-Chief System Prompt (`prompts/mode-1.md`):** A lightweight, self-contained additive instruction layer. It can be used alone or appended to an existing system prompt.
