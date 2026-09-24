@@ -1,96 +1,86 @@
 # Architecture Whitepaper: AI-Chief
 
 ## 1. Abstract
-As autonomous coding agents grow in capability, monolithic agents that handle human interaction, multi-file code editing, package management, and system architecture within a single context window inevitably fail. The failure modes include context pollution, lost instructions, hallucinated edits, and poor user communication.
+As autonomous coding tools grow in popularity, monolithic assistants that attempt to chat with the developer, navigate large codebases, write code, run builds, debug failures, and dump thousands of lines of terminal output into a single conversation thread inevitably degrade. The failure modes include context saturation, forgotten system instructions, hallucinated edits, and conversational noise.
 
-**AI-Chief** introduces an ergonomic, tool-agnostic, 3-tier layered agent framework. By decoupling the human conversation layer (**Chief**) from the context orchestration and memory layer (**Manager**) and the disposable execution engines (**Workers**), AI-Chief guarantees crisp human communication, strict context protection, and clean, auditable technical execution.
+**AI-Chief** introduces an ergonomic, tool-agnostic AI operating system architecture. It transforms any AI coding assistant into a structured, disciplined software engineer governed by a persistent single-agent operating system prompt ([`core/system-prompt.md`](file:///home/ishaan/Work/ai-chief/core/system-prompt.md)), an internal 7-stage execution lifecycle, and filesystem-based persistent memory.
+
+AI-Chief is **one single AI assistant** operating with an internal execution framework. It does **NOT** simulate fake multi-agent dialogues (e.g., *"Chief says..."*, *"Manager says..."*, *"Worker says..."*), ensuring that developers receive clear, high-signal technical deliverables.
 
 ---
 
-## 2. Core Architectural Stratification
+## 2. Core Architecture: The Single-Agent Operating System
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                      HUMAN USER                        │
-└──────────────────────────┬─────────────────────────────┘
-                           │ Conversational updates (<10 sentences)
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│                     CHIEF AGENT                        │
-│ - Natural language persona                             │
-│ - Empathy & intent extraction                          │
-│ - Zero code generation / zero log dumps                │
-│ - Reads: memory/chief/preferences.md                   │
-└──────────────────────────┬─────────────────────────────┘
-                           │ Goal Delegation
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│                    MANAGER AGENT                       │
-│ - Permanent intelligence layer                         │
-│ - Task decomposition & context bounding                │
-│ - Compression of worker execution outputs              │
-│ - Manages memory/manager/ & memory/project/            │
-└────────────┬─────────────────────────────▲─────────────┘
-             │ Task Payload                │ Compressed
-             │ (Bounded Context)           │ Report
-             ▼                             │
-┌──────────────────────────┐               │
-│ DISPOSABLE WORKER AGENT  │───────────────┘
-│ - Code & tool execution  │
-│ - Ephemeral lifecycle    │
-│ - Zero persistent state  │
-└──────────────────────────┘
+                    ┌────────────────────────┐
+                    │       Human User       │
+                    └───────────┬────────────┘
+                                │ Command (/chief, /chief-build, etc.)
+                                ▼
+                    ┌────────────────────────┐
+                    │ AI-Chief System Prompt │ (core/system-prompt.md)
+                    └───────────┬────────────┘
+                                │
+                                ▼
+                    ┌────────────────────────┐
+                    │   Internal Execution   │
+                    │       Framework        │ (7-Stage Pipeline)
+                    │  (Understand ➔ Plan    │
+                    │   ➔ Bound ➔ Execute    │
+                    │   ➔ Test ➔ Compress)   │
+                    └───────────┬────────────┘
+                                │ High-Signal Response
+                                ▼
+                    ┌────────────────────────┐
+                    │     Human Response     │ (Summary / Changes / Status / Next)
+                    └────────────────────────┘
 ```
 
 ---
 
-## 3. Component Deep Dive
+## 3. The 7-Stage Internal Pipeline
 
-### 3.1 Chief Agent (Human Interface)
-The Chief Agent is the outward-facing ambassador.
-- **Intent Filtration:** Strips conversational ambiguities and synthesizes actionable goals.
-- **Tone Guard:** Protects the human from technical friction (stack traces, git conflicts, test runner logs).
-- **Execution Firewall:** Never directly triggers file modifications or shell tools.
+Rather than exposing messy tool output, intermediate reasoning, and test dumps, AI-Chief processes tasks internally across 7 deterministic phases:
 
-### 3.2 Manager Agent (Context Controller)
-The Manager Agent is the system's brain and context router.
-- **Boundary Formulation:** Rather than passing an entire codebase to a worker, the Manager selects only the targeted files, symbols, and constraints.
-- **Semantic Compression:** Workers generate vast volumes of raw text (e.g., `npm test` output with 200 passing lines). Manager filters this down to high-signal summaries.
-- **Memory Persistence:** Writes architectural choices into `memory/manager/decisions.md` (ADRs) and updates task milestones in `memory/manager/project_state.md`.
-
-### 3.3 Worker Agent (Disposable Execution Engine)
-Workers are stateless, disposable worker bees.
-- **Lifecycle:** Born with a single task payload (`runtime/tasks/task-<id>.md`), execute their objective using code editing, terminal, and debugging tools, write a structured report (`templates/worker_report.md`), and terminate.
-- **Isolation:** A worker failure or crash does not taint the conversation context of Chief or the planning state of Manager.
-
-### 3.4 Cleaner Agent (Hygiene & Compaction)
-The Cleaner Agent runs asynchronously or periodically to keep the repository's Markdown memory lean.
-- **Pruning:** Consolidates closed tasks, removes old runtime task files, and deduplicates conversation state.
-- **Safety Rails:** Strictly prevented from touching user preferences, ADRs, or agent prompt definitions.
+1. **Understand Request:** Analyze user intent, extract requirements, and identify implicit constraints.
+2. **Context Check:** Ingest [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md) and persistent memory from [`memory/`](file:///home/ishaan/Work/ai-chief/memory/) (`preferences.md`, `decisions.md`, `project_state.md`).
+3. **Context Bounding:** Determine strictly the minimal set of files needed for the task to avoid prompt bloat.
+4. **Internal Planning:** Formulate an atomic, minimal-dependency execution roadmap. (If `/chief-plan` was triggered, record tasks and stop without editing code).
+5. **Modular Execution:** Write defensive, modular code changes adhering to repository conventions.
+6. **Verification & Testing:** Validate changes using compiler checks, linters, and unit test suites.
+7. **Semantic Compression:** Filter raw test outputs and compiler passes into the clean 4-field response format.
 
 ---
 
-## 4. Token Economics & Context Protection
+## 4. Context Protection & Token Economics
 
-In a standard monolithic agent workflow:
-- Turn 1: 2,000 tokens (System prompt + user request)
-- Turn 2: 12,000 tokens (Read 4 files + build command)
-- Turn 3: 25,000 tokens (Test failure traceback + fix attempt)
-- Turn 10: 80,000+ tokens (Degraded reasoning, high cost, loss of early instructions)
+In a standard unstructured agent interaction:
+- **Turn 1:** 2,000 tokens (System prompt + user request)
+- **Turn 2:** 15,000 tokens (Greedy repository search + 6 files read)
+- **Turn 3:** 30,000 tokens (Compiler stack trace + messy diff attempt)
+- **Turn 10:** 80,000+ tokens (Context degradation, high latency, loss of early constraints)
 
 In **AI-Chief**:
-- **Chief Context:** Stays consistently under 2,000 tokens (pure human conversation).
-- **Manager Context:** Retains only curated project state, ADRs, and high-level milestones (~3,000 - 5,000 tokens).
-- **Worker Context:** Fresh, pristine context for every task (~4,000 - 8,000 tokens). Terminated immediately upon report delivery.
+- **Bounded Ingestion:** Context is bounded strictly to target files.
+- **The Filesystem Rule:** *The conversation is temporary. The filesystem is the source of truth.* Stale conversational context is discarded on demand via `/chief+`, loading fresh instructions from disk.
+- **Predictable Output:** Responses are constrained to fewer than 10 sentences or the 4-field summary schema, preventing conversational token inflation.
 
 ---
 
 ## 5. Portability & Zero-Dependency Philosophy
 
 AI-Chief requires:
-- No database engine (PostgreSQL, SQLite, ChromaDB, etc.)
-- No backend server process or daemon
+- No database engine (PostgreSQL, SQLite, ChromaDB)
+- No backend server process, daemon, or microservice
 - No Node.js / Python framework installation
-- No proprietary API bindings
+- No proprietary API bindings or keys
 
-Any system capable of reading and editing files (such as Claude Code, OpenAI Codex, Google Antigravity, Cursor, or Aider) can run AI-Chief by navigating the directory and following the role instructions.
+Any system capable of reading and editing files (Claude Code, OpenAI Codex, Google Antigravity, Cursor, Windsurf, or Gemini CLI) can run AI-Chief natively.
+
+---
+
+## 6. Advanced Extension: Native Multi-Agent Orchestration
+
+On platforms featuring native background subagent processes (such as Google Antigravity with `invoke_subagent`), AI-Chief can optionally elevate internal pipeline stages into isolated child processes.
+
+See [`docs/advanced/native-agents.md`](file:///home/ishaan/Work/ai-chief/docs/advanced/native-agents.md) for architectural patterns and integration guidelines.

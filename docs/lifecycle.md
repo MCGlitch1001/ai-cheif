@@ -1,31 +1,28 @@
 # The AI-Chief Execution Lifecycle
 
 ## 1. Lifecycle Overview
-The AI-Chief execution lifecycle describes the exact step-by-step path a user request takes from initial prompt to final conversational delivery. The architecture guarantees that no single agent is overwhelmed, context windows remain lean, and the user experiences a calm, productive interface.
+The AI-Chief execution lifecycle describes the exact step-by-step path a user request takes from initial prompt to final high-signal delivery. Rather than dumping raw reasoning, intermediate tool chatter, or multi-agent role tags into the chat, AI-Chief executes a disciplined **7-stage internal pipeline**:
 
 ```
 [1. User Request: /chief Add payments to my app]
                  │
                  ▼
-[2. Chief Ingestion & Delegation] ── (Understands intent, acknowledges, delegates)
+[2. Context & Config Check] ──► Reads core/config.md, preferences, decisions
                  │
                  ▼
-[3. Manager Planning & Context Bounding] ── (Reads memory, creates runtime task file)
+[3. Context Bounding] ────────► Selects minimal necessary files to inspect/modify
                  │
                  ▼
-[4. Worker Execution] ── (Codes, explores, tests, debugs within bounds)
+[4. Internal Planning] ───────► Formulates atomic steps (stops here if /chief-plan)
                  │
                  ▼
-[5. Worker Completion & Structured Report] ── (COMPLETED, CHANGED, TESTS, ISSUES, NEXT STEPS)
+[5. Modular Execution] ───────► Edits files, implements features, runs commands
                  │
                  ▼
-[6. Manager Semantic Compression & Memory Sync] ── (Compresses to 4-line status, updates memory)
+[6. Verification & Testing] ──► Validates with test suites, linters, or dry-runs
                  │
                  ▼
-[7. Chief Human-Facing Response] ── (Conversational update, max 10 sentences)
-                 │
-                 ▼
-[Human User Receives Polished Response]
+[7. Semantic Compression] ────► Delivers clean 4-field response (Summary/Changes/Status/Next)
 ```
 
 ---
@@ -41,97 +38,72 @@ The interaction begins when the user issues a request, optionally prefixed with 
 
 ---
 
-### Stage 2: Chief Receives Request
-The **Chief Agent** acts as the front door.
-
-#### Responsibilities:
-- **Understand User Intent:** Parse the functional objective, identifying key user goals and implicit preferences.
-- **Acknowledge Briefly:** Formulate an immediate, courteous acknowledgement if appropriate.
-- **Create Internal Manager Request:** Package the intent into a clean delegation directive.
-
-#### Inviolable Constraints (Chief Must NEVER):
-- ❌ **Never write code:** Chief does not emit code snippets or diff blocks.
-- ❌ **Never analyze the repository directly:** Chief does not inspect directory trees or parse source files.
-- ❌ **Never read logs:** Chief does not read compiler traces, test outputs, or terminal dumps.
+### Stage 2: Context & Config Ingestion
+Before writing any code or searching files, AI-Chief inspects its persistent instructions and memory on disk:
+- **User Settings:** [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md) (Communication tone, sentence limit, risk level).
+- **User Preferences:** [`memory/chief/preferences.md`](file:///home/ishaan/Work/ai-chief/memory/chief/preferences.md).
+- **Architectural Decisions (ADRs):** [`memory/manager/decisions.md`](file:///home/ishaan/Work/ai-chief/memory/manager/decisions.md).
+- **Project State:** [`memory/manager/project_state.md`](file:///home/ishaan/Work/ai-chief/memory/manager/project_state.md).
 
 ---
 
-### Stage 3: Manager Receives Request
-The **Manager Agent** is the permanent intelligence layer and context controller.
-
-#### Responsibilities:
-- **Read Project Memory:** Ingest [`memory/manager/project_state.md`](file:///home/ishaan/Work/ai-chief/memory/manager/project_state.md), [`memory/manager/decisions.md`](file:///home/ishaan/Work/ai-chief/memory/manager/decisions.md), and [`memory/project/overview.md`](file:///home/ishaan/Work/ai-chief/memory/project/overview.md).
-- **Understand Architecture:** Map the request against the existing technology stack and established conventions.
-- **Decide Task Requirements:** Decompose the request into an atomic, testable unit of work.
-- **Select Initial Context:** Curate the specific files, symbols, and dependencies the Worker will need, avoiding prompt bloat.
-- **Create Runtime Task File:** Write a structured specification to `runtime/tasks/task-<id>.md` following [`templates/task.md`](file:///home/ishaan/Work/ai-chief/templates/task.md).
+### Stage 3: Context Bounding
+To prevent context window saturation and token exhaustion, AI-Chief explicitly isolates the minimal file set needed:
+- Identifies relevant source files, types, and configs.
+- Avoids indiscriminate repository sweeps.
+- Keeps token usage efficient and prevents hallucination.
 
 ---
 
-### Stage 4: Worker Execution
-The **Worker Agent** is an ephemeral, disposable execution engine instantiated specifically for the assigned task.
-
-#### Worker Receives:
-- **Task Description:** Specific goal and scope.
-- **Relevant Files:** Primary paths to inspect and modify.
-- **Expected Result:** Explicit, deterministic criteria for success (e.g. test pass).
-- **Limitations:** Prohibited libraries, files off-limits, and architectural constraints.
-
-#### Worker May:
-- ✅ **Explore the repository:** Inspect adjacent files, types, and configs if required to solve the task.
-- ✅ **Read additional files:** Trace imported symbols or dependencies.
-- ✅ **Code:** Write new files, refactor existing code, and fix syntax errors.
-- ✅ **Test:** Execute test suites (`npm test`, `pytest`, `cargo test`, etc.).
-- ✅ **Debug:** Read compiler errors and iteratively resolve runtime failures.
-
-#### Worker Does NOT:
-- ❌ **Maintain memory:** Worker has zero persistent state across tasks.
-- ❌ **Talk to the user:** Worker communicates solely with the Manager via the execution report.
+### Stage 4: Internal Planning
+AI-Chief drafts an atomic, minimal-dependency execution roadmap:
+- Breaks large requirements into verifiable steps.
+- Identifies potential edge cases, breaking changes, or missing environment secrets.
+- **Planning Mode Trigger:** If the command is `/chief-plan`, AI-Chief saves the proposed roadmap to `memory/manager/active_tasks.md`, formats the plan for the user, and **halts execution without touching source code**.
 
 ---
 
-### Stage 5: Worker Completion & Reporting
-Upon completing the task, the Worker produces a structured report adhering strictly to the protocol:
+### Stage 5: Modular Execution
+When execution is authorized (`/chief` or `/chief-build`):
+- Writes modular, defensive, well-commented code.
+- Adheres strictly to project conventions and existing style guides.
+- Avoids monolithic edits; modifies targeted code blocks cleanly.
+
+---
+
+### Stage 6: Verification & Testing
+Before declaring a task done, AI-Chief runs verification:
+- Executes unit tests (`npm test`, `pytest`, `cargo test`, `go test`).
+- Runs type-checking or linter passes if available.
+- Debugs and fixes any runtime errors encountered during testing.
+
+---
+
+### Stage 7: Semantic Compression & Response Delivery
+AI-Chief absorbs intermediate logs and formats the final deliverable into the standard 4-field schema:
 
 ```markdown
-COMPLETED: [Summary of actions executed]
-CHANGED: [List of files created, modified, or deleted]
-TESTS: [Commands run and test results]
-ISSUES: [Edge cases, remaining risks, or "None"]
-NEXT STEPS: [Logical follow-up tasks]
+Summary:
+[High-level, plain-English summary of what was accomplished]
+
+Changes:
+- [File path or action taken]
+- [File path or action taken]
+
+Status:
+[Completed | Needs attention | Blocked]
+
+Next:
+[Optional recommended next technical action or question for confirmation]
 ```
 
-The Worker then immediately self-terminates, releasing its execution context.
-
 ---
 
-### Stage 6: Manager Compression & Memory Update
-The **Manager Agent** receives the raw Worker report, which may include hundreds of lines of build traces and test output.
+## 3. Advanced Multi-Agent Adaptation
 
-#### Responsibilities:
-1. **Compress Worker Output:** Extract the essential takeaways and format the 4-line status digest:
-   ```markdown
-   STATUS: [SUCCESS | IN_PROGRESS | BLOCKED | FAILED]
-   DONE: [High-level summary of what was achieved]
-   IMPORTANT: [Critical decisions or prerequisites the user must know]
-   NEXT: [Proposed next step]
-   ```
-2. **Update Persistent Memory:**
-   - Update [`memory/manager/project_state.md`](file:///home/ishaan/Work/ai-chief/memory/manager/project_state.md) with milestone progress.
-   - Record completed work in [`memory/manager/active_tasks.md`](file:///home/ishaan/Work/ai-chief/memory/manager/active_tasks.md).
-   - If a new architectural pattern was chosen, log an ADR in [`memory/manager/decisions.md`](file:///home/ishaan/Work/ai-chief/memory/manager/decisions.md).
+On platforms featuring native background subagents (such as Google Antigravity `invoke_subagent`), this 7-stage lifecycle can optionally be distributed across subagent processes:
+- Stages 1–3: Handled by Orchestrator / Manager.
+- Stages 4–6: Handled by disposable Worker subagent.
+- Stage 7: Handled by Manager compression and Chief user interface.
 
----
-
-### Stage 7: Chief Response
-The **Chief Agent** receives the Manager's compressed 4-line digest and translates it for the human user.
-
-#### Responsibilities:
-- **Conversational Delivery:** Explain what was completed clearly, warmly, and concisely.
-- **Strict Brevity:** Maximum of **10 sentences** (typically 2 to 4 sentences).
-- **Surface Actionable Items:** Alert the user to decisions or credentials needed (e.g. "Please add your Stripe API keys to `.env`").
-
-#### Inviolable Constraints (Chief Must NEVER Expose):
-- ❌ **Never expose Worker details:** No worker IDs, subagent names, or temporary logs.
-- ❌ **Never expose internal protocols:** Never print `STATUS:`, `DONE:`, `TASK:`, or raw protocol blocks.
-- ❌ **Never expose the agent chain:** The user experiences a cohesive conversation with Chief, not the internal mechanics of a multi-tiered pipeline.
+See [`docs/advanced/native-agents.md`](file:///home/ishaan/Work/ai-chief/docs/advanced/native-agents.md) for complete details.

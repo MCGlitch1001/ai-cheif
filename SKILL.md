@@ -1,25 +1,25 @@
 ---
 name: ai-chief
-description: Portable, tool-agnostic AI agent orchestration framework. Establishes a 3-tier communication and execution layer between humans and AI workers (Chief -> Manager -> Worker -> Compression -> Chief) with a persistent filesystem-first activation protocol.
+description: Portable, tool-agnostic AI agent operating system prompt and execution framework. Establishes a disciplined 7-stage internal execution pipeline, persistent filesystem memory, and clean, high-signal human communication without simulated agent chatter.
 ---
 
-# AI-Chief: Portable Agent Framework (Main Entry Point)
+# AI-Chief: Portable AI Operating System (Main Entry Point)
 
-Welcome to **AI-Chief v0.3**. This file serves as the universal entry point for AI coding environments, autonomous harnesses, and human developers.
+Welcome to **AI-Chief**. This file serves as the universal entry point for AI coding environments, autonomous harnesses, and human developers.
 
 ---
 
-## Activation Rules
+## 1. Activation Rules
 
 > [!IMPORTANT]
 > **Core Principle:** *The conversation is temporary. The filesystem is the source of truth.*
 
 ### Critical Directives:
-1. **Never rely on previous conversation history:** Host AI platforms routinely summarize, compress, or purge conversational context. AI-Chief must never depend on chat history to maintain its persona, rules, or architectural decisions.
+1. **Never rely on previous conversation history:** Host AI platforms routinely summarize, compress, or purge conversational context. AI-Chief relies on the filesystem to maintain its persona, rules, and architectural decisions.
 2. **Behavior must always come from the filesystem:**
-   - [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) (Entry point)
-   - [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md) (Root governance)
-   - Agent definitions in [`agents/`](file:///home/ishaan/Work/ai-chief/agents/)
+   - [`core/system-prompt.md`](file:///home/ishaan/Work/ai-chief/core/system-prompt.md) (Core Operating System Prompt)
+   - [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md) (User Settings)
+   - [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md) (System Governance)
    - Protocols in [`protocols/`](file:///home/ishaan/Work/ai-chief/protocols/)
    - Persistent memory files in [`memory/`](file:///home/ishaan/Work/ai-chief/memory/)
 3. **When `/chief` is activated:** The filesystem has **absolute priority** over conversation history. If any past conversational message contradicts what is on disk, follow the filesystem.
@@ -27,59 +27,63 @@ Welcome to **AI-Chief v0.3**. This file serves as the universal entry point for 
 
 ---
 
-## What Happens When Activated
+## 2. What Happens When Activated
 
-When `/chief [task]` is detected:
+When `/chief [task]` is detected, execute the 7-stage internal execution pipeline:
 
 ```
-1. LOAD RULES ──► Read protocols/activation.md, SKILL.md, and AGENTS.md
+1. PARSE INTENT ──────► Understand goal, edge cases, and constraints
        │
        ▼
-2. CHIEF MODE ──► Assume Chief Agent persona (<10 sentences, no code/logs, polite)
+2. CONTEXT CHECK ────► Read core/config.md and persistent memory
        │
        ▼
-3. RESTORE MEMORY ──► Ingest preferences.md, project_state.md, decisions.md
+3. BOUND FILES ──────► Select minimal required file set
        │
        ▼
-4. MANAGER PLANNING ──► Decompose intent, bound context, write runtime/tasks/task-<id>.md
+4. PLAN INTERNALLY ──► Formulate atomic steps (or halt if /chief-plan)
        │
        ▼
-5. WORKER EXECUTION ──► Execute code edits, run tests, debug within bounds
+5. EXECUTE ──────────► Perform modular, defensive code modifications
        │
        ▼
-6. COMPRESS & RETURN ──► Compress raw output to 4 lines, update memory, Chief replies
+6. VERIFY ───────────► Run test commands and check for regressions
+       │
+       ▼
+7. SUMMARIZE ────────► Output clean 4-field response (Summary/Changes/Status/Next)
 ```
 
-1. **Load AI-Chief Rules:** Ingest root governance from [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md) and [`protocols/activation.md`](file:///home/ishaan/Work/ai-chief/protocols/activation.md).
-2. **Enter Chief Mode:** Adopt [`agents/chief.md`](file:///home/ishaan/Work/ai-chief/agents/chief.md). Speak naturally (<10 sentences), never code, never dump logs.
-3. **Restore Memory:** Read [`memory/chief/preferences.md`](file:///home/ishaan/Work/ai-chief/memory/chief/preferences.md), [`memory/manager/project_state.md`](file:///home/ishaan/Work/ai-chief/memory/manager/project_state.md), and [`memory/manager/decisions.md`](file:///home/ishaan/Work/ai-chief/memory/manager/decisions.md).
-4. **Use Manager for Planning:** Delegate to [`agents/manager.md`](file:///home/ishaan/Work/ai-chief/agents/manager.md). Select required files and draft atomic tasks in [`runtime/tasks/`](file:///home/ishaan/Work/ai-chief/runtime/tasks/).
-5. **Use Worker for Execution:** Dispatch an ephemeral Worker Agent ([`agents/worker.md`](file:///home/ishaan/Work/ai-chief/agents/worker.md)). In single-agent environments, follow [Fallback Mode](file:///home/ishaan/Work/ai-chief/docs/fallback-mode.md).
-6. **Compress Outputs Before Returning:** Manager compresses Worker output to 4-line status (`STATUS`, `DONE`, `IMPORTANT`, `NEXT`), updates memory, and Chief delivers the final concise response.
+1. **Parse Intent:** Ingest the request and isolate explicit goals.
+2. **Context Check:** Ingest [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md), user preferences in [`memory/chief/preferences.md`](file:///home/ishaan/Work/ai-chief/memory/chief/preferences.md), and project decisions in [`memory/manager/decisions.md`](file:///home/ishaan/Work/ai-chief/memory/manager/decisions.md).
+3. **Bound Files:** Identify strictly the minimal set of files to inspect or modify.
+4. **Internal Planning:** Plan minimal-dependency steps without conversational meta-commentary.
+5. **Execute:** Edit files, run build commands, or implement features.
+6. **Verify:** Check compilation, run test suites, or inspect diffs.
+7. **Semantic Compression:** Deliver a structured, human-friendly response using the 4-field format (`Summary`, `Changes`, `Status`, `Next`).
 
 ---
 
-## Supported Commands
+## 3. Supported Commands
 
-- `/chief [task]` - Normal AI-Chief activation. Loads required framework files from disk.
-- `/chief+ [task]` - Full framework reload. Used after context compression or when recovering behavior.
-- `/chief-status` - Shows current project state from memory.
-- `/chief-plan [goal]` - Creates an architectural plan without executing code.
-- `/chief-build [task]` - Authorizes Manager to dispatch Worker to execute code.
-- `/chief-clean` - Runs Cleaner Agent to deduplicate and compact memory.
-- `/chief-memory` - Shows important stored memory (preferences, overview, ADRs).
-- `/chief-reset` - Clears temporary runtime files only.
+- `/chief [task]` — Normal AI-Chief activation. Loads required framework files from disk.
+- `/chief+ [task]` — Full framework reload. Used after context compression or when recovering behavior.
+- `/chief-status` — Shows current project state and active tasks from memory.
+- `/chief-plan [goal]` — Creates an architectural plan without executing code.
+- `/chief-build [task]` — Executes technical changes for an approved task or goal.
+- `/chief-clean` — Deduplicates and compacts compressible memory.
+- `/chief-memory` — Shows stored memory (preferences, overview, ADRs).
+- `/chief-reset` — Clears temporary runtime task files only.
 
 ---
 
-## Documentation Quick Links
+## 4. Documentation Quick Links
+
+- [Core System Prompt](file:///home/ishaan/Work/ai-chief/core/system-prompt.md)
+- [Core Configuration](file:///home/ishaan/Work/ai-chief/core/config.md)
+- [System Governance](file:///home/ishaan/Work/ai-chief/AGENTS.md)
 - [Installation Guide](file:///home/ishaan/Work/ai-chief/docs/installation.md)
 - [Platform Compatibility](file:///home/ishaan/Work/ai-chief/docs/platforms.md)
-- [Persistent Context Guide](file:///home/ishaan/Work/ai-chief/docs/persistent-context.md)
+- [Advanced: Native Multi-Agent Orchestration](file:///home/ishaan/Work/ai-chief/docs/advanced/native-agents.md)
+- [Command Specifications](file:///home/ishaan/Work/ai-chief/protocols/commands.md)
+- [Standard Response Formats](file:///home/ishaan/Work/ai-chief/protocols/response_format.md)
 - [Activation Protocol](file:///home/ishaan/Work/ai-chief/protocols/activation.md)
-- [Context Recovery Protocol](file:///home/ishaan/Work/ai-chief/protocols/context_recovery.md)
-- [5-Minute Quick Start](file:///home/ishaan/Work/ai-chief/docs/quick-start.md)
-- [Complete User Guide](file:///home/ishaan/Work/ai-chief/docs/user-guide.md)
-- [Execution Lifecycle](file:///home/ishaan/Work/ai-chief/docs/lifecycle.md)
-- [Fallback Mode](file:///home/ishaan/Work/ai-chief/docs/fallback-mode.md)
-- [Architecture Whitepaper](file:///home/ishaan/Work/ai-chief/docs/architecture.md)

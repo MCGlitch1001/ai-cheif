@@ -9,48 +9,55 @@ AI-Chief is designed as a **portable, zero-dependency framework**. It does not r
 
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| `/chief` | `/chief [request]` | Activates AI-Chief mode, applies Chief persona, and initiates work. |
-| `/chief-status` | `/chief-status` | Returns a concise overview of the current project state and task list. |
-| `/chief-clean` | `/chief-clean` | Runs the Cleaner Agent to prune stale tasks and compact memory. |
+| `/chief` | `/chief [request]` | Activates AI-Chief mode and executes request through the 7-stage pipeline. |
+| `/chief+` | `/chief+ [request]` | Full framework reload. Re-syncs all instructions and memory from disk. |
+| `/chief-status` | `/chief-status` | Returns a concise overview of current project state and task list from memory. |
+| `/chief-plan` | `/chief-plan [goal]` | Decomposes a goal into an architectural plan without executing code. |
+| `/chief-build` | `/chief-build [task]` | Executes planned or requested technical modifications. |
+| `/chief-clean` | `/chief-clean` | Compacts and deduplicates compressible memory in `memory/`. |
 | `/chief-memory` | `/chief-memory` | Displays stored preferences, project overview, and key ADR decisions. |
 | `/chief-reset` | `/chief-reset` | Cleans up ephemeral runtime files in `runtime/tasks/`. |
-| `/chief-plan` | `/chief-plan [goal]` | Decomposes a goal into a proposed task list without executing code. |
-| `/chief-build` | `/chief-build [task]` | Authorizes Manager to dispatch Worker agents to execute changes. |
 
 ---
 
 ## 3. How Users Activate AI-Chief
 
-### Scenario A: Starting a New Session
-When opening a session in any AI assistant, type:
+### Scenario A: Executing a Feature
+When starting a task in any AI assistant, type:
 ```text
 /chief Let's begin working on the user registration system.
 ```
-*Effect:* The model reads [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) and [`agents/chief.md`](file:///home/ishaan/Work/ai-chief/agents/chief.md), assumes the Chief persona, greets the user, and initiates Manager orchestration.
+*Effect:* The model loads [`core/system-prompt.md`](file:///home/ishaan/Work/ai-chief/core/system-prompt.md) and [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md), runs the 7-stage internal execution pipeline, and responds with the standard 4-field format (`Summary`, `Changes`, `Status`, `Next`).
 
-### Scenario B: Checking Health & Status
+### Scenario B: Full Reload After Long Sessions
+```text
+/chief+ refactor the authentication layer
+```
+*Effect:* Discards stale conversation context, re-reads all core instructions and memory from disk, and executes with pristine context.
+
+### Scenario C: Checking Health & Status
 ```text
 /chief-status
 ```
-*Effect:* Returns current milestone progress and any in-flight or recently completed tasks.
+*Effect:* Reads `memory/manager/project_state.md` and `memory/manager/active_tasks.md`, returning a concise summary under 10 sentences.
 
-### Scenario C: Safe Staged Planning
+### Scenario D: Safe Staged Planning
 ```text
 /chief-plan Add Stripe subscription billing with monthly and annual tiers
 ```
-*Effect:* Manager analyzes existing models and creates queued task specifications in `memory/manager/active_tasks.md`. Chief replies with the plan. **No files or code are touched until authorized.**
+*Effect:* Analyzes existing repository models, writes proposed task roadmap to `memory/manager/active_tasks.md`, and outputs the plan. **No source code is modified.**
 
-### Scenario D: Authorizing Execution
+### Scenario E: Authorizing Execution
 ```text
-/chief-build TASK-001
+/chief-build Implement Stripe checkout session creation
 ```
-*Effect:* Manager dispatches a disposable Worker with `runtime/tasks/task-001.md`. Worker writes code, executes tests, and delivers an execution report. Manager updates memory, and Chief reports success.
+*Effect:* Executes code changes, runs unit tests, updates memory, and delivers the 4-field response.
 
-### Scenario E: Cleaning Up Memory
+### Scenario F: Cleaning Up Memory
 ```text
 /chief-clean
 ```
-*Effect:* Cleaner Agent runs, archives completed tasks, removes duplicate notes, and ensures memory files stay lean.
+*Effect:* Archives completed tasks, removes duplicate notes, and compacts conversation state while preserving permanent ADRs.
 
 ---
 
@@ -59,22 +66,21 @@ When opening a session in any AI assistant, type:
 Because AI-Chief relies on standard file hierarchies and markdown prompts, different AI coding environments can implement it easily without code modifications:
 
 ### 4.1 Google Antigravity (AGY)
-- **Skill Discovery:** Antigravity automatically detects [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) in the project workspace.
-- **Subagent Execution:** Antigravity can use its native `invoke_subagent` capability to spawn disposable subagents mapped directly to [`agents/worker.md`](file:///home/ishaan/Work/ai-chief/agents/worker.md) or [`agents/cleaner.md`](file:///home/ishaan/Work/ai-chief/agents/cleaner.md).
-- **Governance:** Antigravity enforces [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md) at the root level before executing tasks.
+- **Discovery:** Antigravity automatically detects [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) and [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md) in the project workspace.
+- **Execution:** Runs natively using [`core/system-prompt.md`](file:///home/ishaan/Work/ai-chief/core/system-prompt.md) (with optional subagent dispatch via `invoke_subagent` per [`docs/advanced/native-agents.md`](file:///home/ishaan/Work/ai-chief/docs/advanced/native-agents.md)).
 
 ### 4.2 Claude Code (Anthropic CLI)
-- **Custom Commands:** In Claude Code, commands like `/chief` or `/chief-status` can be configured as custom slash commands in `.clauderc` or invoked directly in prompt text.
-- **Memory Tracking:** Claude Code reads files directly using bash or view commands, persisting memory in `memory/`.
-- **Worker Isolation:** Claude Code can invoke tasks in subshells or separate branch worktrees to guarantee clean worker disposal.
+- **Prompt Reference:** Reference `@core/system-prompt.md` or `@AGENTS.md` in prompt instructions.
+- **Slash Commands:** Commands like `/chief` or `/chief-status` can be used directly in prompts.
+- **Memory Tracking:** Claude Code reads and updates `memory/` using filesystem tools.
 
 ### 4.3 OpenAI Codex / ChatGPT CLI
-- **System Prompt Reference:** Anchor the project by passing `AGENTS.md` and `agents/chief.md` in the system prompt or project instructions.
-- **Prefix Matching:** When the user types `/chief <message>`, the model matches the pattern in [`protocols/commands.md`](file:///home/ishaan/Work/ai-chief/protocols/commands.md) and triggers the corresponding delegation flow.
+- **System Prompt Reference:** Anchor the project by passing `core/system-prompt.md` in the system prompt.
+- **Text Triggers:** Match prefix `/chief <message>` to trigger the 7-stage internal pipeline.
 
 ### 4.4 Cursor / Windsurf / GitHub Copilot
-- **Rule Files:** Include `@AGENTS.md` and `@SKILL.md` in `.cursorrules` or `.windsurfrules`.
-- **Chat Interface:** When chatting in Composer or Cascade, preface requests with `/chief` to instruct the model to adopt the Chief persona and follow the 3-tier rules.
+- **Rule Files:** Include `@core/system-prompt.md` and `@AGENTS.md` in `.cursorrules` or `.windsurfrules`.
+- **Chat Interface:** In Composer or Cascade, preface requests with `/chief` to enforce the 4-field output schema and non-destructive planning.
 
 ---
 

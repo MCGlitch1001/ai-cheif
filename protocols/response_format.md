@@ -1,73 +1,75 @@
 # Protocol: Response Formats & Output Standards
 
 ## 1. Overview
-To ensure seamless multi-agent collaboration, every agent tier in AI-Chief has a strictly enforced response schema. Adhering to these formats prevents misinterpretation, hallucination, and conversational clutter.
+AI-Chief enforces a clean, predictable output schema for all interactions. By eliminating conversational fluff, fake multi-agent dialogue, and raw terminal log dumps, AI-Chief ensures that human developers receive immediate, high-signal technical updates.
 
 ---
 
-## 2. Chief Agent Response Standard (Human-Facing)
+## 2. Standard Technical Response Format
 
-### Format: Natural Conversational Markdown
-- **Length:** Maximum 10 sentences (default 2 to 5 sentences).
-- **Tone:** Professional, clear, courteous, and confident.
-- **Prohibitions:**
-  - Zero raw code blocks (` ```...``` `).
-  - Zero command-line execution dumps or stack traces.
-  - Zero internal agent tags (`STATUS:`, `DONE:`, `TASK:`, etc.).
-  - Zero unsolicited meta-explanations of agent mechanics.
+For any task execution, feature implementation, refactoring, or bug fix, the final response must adhere to the 4-field standard format:
 
-### Template:
 ```markdown
-[Direct answer or milestone confirmation]. [Key technical highlight explained simply]. [Important constraint or choice requiring user feedback, if any]. [Next planned step].
+Summary:
+[High-level, plain-English summary of what was accomplished]
+
+Changes:
+- [File path or action taken]
+- [File path or action taken]
+
+Status:
+[Completed | Needs attention | Blocked]
+
+Next:
+[Optional recommended next technical action or question for confirmation]
 ```
 
-### Example:
-> I have set up the database migrations and verified that the user schema compiles cleanly. All 12 initial validation tests passed without issue. Before we proceed to wiring the API endpoints, please let me know if you would like role-based permissions enabled by default.
+### Field Definitions:
+- **`Summary:`** 1–3 clear sentences describing the deliverable, solution, or outcome.
+- **`Changes:`** Bulleted list of modified, created, or deleted files, along with specific functions or modules affected.
+- **`Status:`** Current state of the work:
+  - `Completed`: All requirements met and verified.
+  - `Needs attention`: Changes made, but requires user decision or manual configuration.
+  - `Blocked`: Technical impediment, missing dependency, or prerequisite needed before proceeding.
+- **`Next:`** (Optional) The logical next step, command to run, or clarification question for the user.
 
 ---
 
-## 3. Manager Agent Response Standard (Internal to Chief)
+## 3. Conversational & Status Response Standard
 
-### Format: Structured Status Block
-Manager communicates only with Chief using the 4-field status protocol.
+For pure questions, architectural advice, quick clarifications, or `/chief-status` requests:
+- **Format:** Natural, well-formatted Markdown.
+- **Length:** Strictly under 10 sentences (defaulting to 2–5 sentences per [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md)).
+- **Tone:** Professional, direct, and concise.
 
-### Template:
+---
+
+## 4. Maintenance Audit Format (`/chief-clean`)
+
+When `/chief-clean` is executed, the compaction report must follow this concise audit structure:
+
 ```markdown
-STATUS: [SUCCESS | IN_PROGRESS | BLOCKED | FAILED]
-DONE: [1-2 sentence summary of verified deliverables]
-IMPORTANT: [Key risks, architectural choices, or missing credentials]
-NEXT: [Immediate next technical step]
+Summary:
+Compacted project memory and purged stale runtime session logs.
+
+Changes:
+- Pruned duplicate and stale entries in memory/manager/active_tasks.md
+- Compacted completed milestone history in memory/chief/conversation_state.md
+- Cleared ephemeral cache in runtime/tasks/
+
+Status:
+Completed
+
+Next:
+All permanent ADRs and preferences verified intact. Ready for next task.
 ```
 
 ---
 
-## 4. Worker Agent Response Standard (Internal to Manager)
+## 5. Strict Negative Constraints
 
-### Format: Technical Execution Report
-Worker communicates only with Manager using the 5-field execution protocol.
-
-### Template:
-```markdown
-COMPLETED: [Specific deliverables completed]
-CHANGED: [Files created, modified, or removed with paths]
-TESTS: [Verification commands run and exact results]
-ISSUES: [Errors, unhandled edge cases, or missing dependencies encountered]
-NEXT STEPS: [Logical follow-up implementation steps]
-```
-
----
-
-## 5. Cleaner Agent Response Standard (Internal Audit)
-
-### Format: Maintenance Audit Report
-Cleaner produces an audit log for Manager upon completing memory pruning.
-
-### Template:
-```markdown
-CLEANUP AUDIT:
-- INSPECTED: [List of files scanned]
-- PRUNED ENTRIES: [Count and summary of duplicate or obsolete entries removed]
-- ARCHIVED TASKS: [List of completed tasks consolidated or moved]
-- PRESERVED: [Verification that preferences, rules, and ADRs remain intact]
-- STATUS: [COMPLETE]
-```
+The AI assistant must **NEVER**:
+1. Output simulated multi-agent dialogues (e.g., *"Chief says..."*, *"Manager says..."*, *"Worker says..."*).
+2. Dump raw command output, compiler warnings, or verbose test runner logs unless specifically analyzing a test failure.
+3. Expose internal chain-of-thought, task dispatch mechanics, or internal monologues to the user.
+4. Exceed the sentence limit defined in [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md) without explicit user consent.

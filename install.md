@@ -19,7 +19,7 @@ This document defines the automated setup and verification procedure for any AI 
 ### ✅ What the Installer Must ALWAYS Do:
 1. **Zero-dependency & portable:** Operate strictly using local filesystem operations (Markdown files).
 2. **Handle existing installations safely:** Detect existing files and perform non-destructive repair/sync if needed.
-3. **Configure `/chief` and `/chief+` activation:** Ensure the model is primed to read the filesystem on command.
+3. **Configure `/chief` and `/chief+` activation:** Ensure the model is primed to read `core/system-prompt.md` and the filesystem on command.
 4. **Perform post-installation verification:** Run the 10-point verification checklist before emitting confirmation.
 5. **Conclude with the exact standard onboarding response:** Emit the exact fixed summary block.
 
@@ -27,13 +27,13 @@ This document defines the automated setup and verification procedure for any AI 
 
 ## 2. Deterministic Installation Sequence
 
-When the AI assistant receives the installation instruction, it must execute the following 6 stages:
+When the AI assistant receives the installation instruction, it must execute the following 5 stages:
 
 ### Stage 1: Inspection & Detection
-1. Check if `ai-chief/` directory or root AI-Chief governance files (`AGENTS.md`, `SKILL.md`) already exist.
+1. Check if `ai-chief/` directory or root AI-Chief governance files (`AGENTS.md`, `SKILL.md`, `core/system-prompt.md`) already exist.
 2. If already installed:
    - Inspect existing files against the manifest in Section 3.
-   - If all files exist and are healthy, proceed directly to Verification (Stage 5) without overwriting user memory.
+   - If all files exist and are healthy, proceed directly to Verification without overwriting user memory.
    - If files are missing, non-destructively scaffold only the missing files.
 3. If not installed:
    - Determine installation target path (typically `./ai-chief/` if installed inside a larger codebase, or project root if dedicated).
@@ -42,6 +42,7 @@ When the AI assistant receives the installation instruction, it must execute the
 Create the standard directory tree:
 ```text
 ai-chief/
+├── core/
 ├── agents/
 ├── memory/
 │   ├── chief/
@@ -53,27 +54,27 @@ ai-chief/
 ├── templates/
 ├── config/
 └── docs/
+    └── advanced/
 ```
 
-### Stage 3: Core Governance & Agent Deployment
-Ensure the following core directives and agent contracts are populated:
-- [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md) — Root system governance, 3-tier rules, and command specifications.
-- [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) — Primary entry point with Activation Rules and 5-step operational loop.
-- [`agents/chief.md`](file:///home/ishaan/Work/ai-chief/agents/chief.md) — Chief Agent persona (<10 sentences, zero code/log dumps).
-- [`agents/manager.md`](file:///home/ishaan/Work/ai-chief/agents/manager.md) — Manager Agent persona (context controller, task planner, memory sync).
-- [`agents/worker.md`](file:///home/ishaan/Work/ai-chief/agents/worker.md) — Worker Agent persona (ephemeral execution engine, tools, testing).
-- [`agents/cleaner.md`](file:///home/ishaan/Work/ai-chief/agents/cleaner.md) — Cleaner Agent persona (memory compaction, deduplication).
+### Stage 3: Core System Prompt & Governance Deployment
+Ensure the following core directives and governance contracts are populated:
+- [`core/system-prompt.md`](file:///home/ishaan/Work/ai-chief/core/system-prompt.md) — Unified single-agent AI operating system prompt.
+- [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md) — Editable user configuration (style, limits, risk).
+- [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md) — System governance and operational directives.
+- [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) — Universal entry point and activation rules.
+- Optional multi-agent roles in `agents/` (`chief.md`, `manager.md`, `worker.md`, `cleaner.md`) for platforms with native subagent engines.
 
 ### Stage 4: Protocol, Memory & Runtime Staging
-Ensure all protocols, persistent memory files, runtime state, and templates are established:
+Ensure all protocols, persistent memory files, and runtime state are established:
 - **Protocols:**
   - `protocols/activation.md` (6-step persistent activation bootstrap)
   - `protocols/context_recovery.md` (Self-healing `/chief+` cold-start reload)
   - `protocols/commands.md` (Universal text command protocol)
-  - `protocols/delegation.md` (Inter-agent communication schemas)
+  - `protocols/response_format.md` (Exact 4-field output schema)
   - `protocols/compression.md` (Semantic output compression rules)
   - `protocols/memory_rules.md` (3-tier memory durability hierarchy)
-  - `protocols/response_format.md` (Exact output schemas across all tiers)
+  - `protocols/delegation.md` (Inter-agent schemas for native subagent environments)
 - **Memory (Pristine Initial State):**
   - `memory/chief/preferences.md` (User communication preferences)
   - `memory/chief/conversation_state.md` (Active conversational state)
@@ -83,12 +84,9 @@ Ensure all protocols, persistent memory files, runtime state, and templates are 
   - `memory/project/overview.md` (Project overview and domain context)
 - **Runtime:**
   - `runtime/active_session.md` (Active session state & telemetry)
-  - `runtime/current_agent.md` (Active agent tracking for Fallback Mode)
-  - `runtime/message_queue.md` (Inter-agent protocol message buffer)
   - `runtime/tasks/README.md` (Ephemeral task staging documentation)
 - **Templates & Config:**
-  - `templates/task.md` (Manager → Worker delegation template)
-  - `templates/worker_report.md` (Worker → Manager execution report template)
+  - `templates/task.md` (Task specification template)
   - `templates/memory_update.md` (ADR and task status update templates)
   - `config/settings.md` (Model tiers, token limits, thresholds)
 
@@ -99,17 +97,17 @@ Ensure all protocols, persistent memory files, runtime state, and templates are 
 Before returning the final response to the user, the AI assistant **MUST** perform this 10-point self-audit:
 
 | # | Checkpoint | Verification Criteria | Status |
-| :-: | :--- | :--- | :---: |
-| 1 | **Directory Hierarchy** | `agents/`, `memory/`, `runtime/tasks/`, `protocols/`, `templates/`, `config/`, `docs/` exist. | PASS / FAIL |
-| 2 | **Role Files** | `chief.md`, `manager.md`, `worker.md`, `cleaner.md` exist in `agents/`. | PASS / FAIL |
-| 3 | **Protocol Files** | All 7 protocols exist in `protocols/`. | PASS / FAIL |
-| 4 | **Memory Structure** | All 6 memory files exist in `memory/` across `chief/`, `manager/`, `project/`. | PASS / FAIL |
-| 5 | **Runtime Structure** | `active_session.md`, `current_agent.md`, `message_queue.md`, and `runtime/tasks/` exist. | PASS / FAIL |
-| 6 | **Commands Documented** | Commands `/chief`, `/chief+`, `/chief-status`, `/chief-plan`, `/chief-build`, `/chief-clean`, `/chief-memory`, `/chief-reset` documented in `protocols/commands.md`. | PASS / FAIL |
-| 7 | **Activation Discoverable** | `SKILL.md` and `AGENTS.md` define persistent activation rules. | PASS / FAIL |
-| 8 | **Reference Validity** | Relative links between files (`protocols/`, `agents/`, `memory/`) resolve without broken paths. | PASS / FAIL |
+| :-: | :--- | :--- | :--- |
+| 1 | **Directory Hierarchy** | `core/`, `agents/`, `memory/`, `runtime/tasks/`, `protocols/`, `templates/`, `config/`, `docs/` exist. | PASS / FAIL |
+| 2 | **Core System Files** | `core/system-prompt.md` and `core/config.md` exist and are valid. | PASS / FAIL |
+| 3 | **Governance Files** | `AGENTS.md` and `SKILL.md` exist and anchor root rules. | PASS / FAIL |
+| 4 | **Protocol Files** | Protocols in `protocols/` exist (activation, commands, response_format, etc.). | PASS / FAIL |
+| 5 | **Memory Structure** | All memory files exist in `memory/` across `chief/`, `manager/`, `project/`. | PASS / FAIL |
+| 6 | **Runtime Structure** | `active_session.md` and `runtime/tasks/` exist. | PASS / FAIL |
+| 7 | **Commands Documented** | Commands `/chief`, `/chief+`, `/chief-status`, `/chief-plan`, `/chief-build`, `/chief-clean`, `/chief-memory`, `/chief-reset` documented in `protocols/commands.md`. | PASS / FAIL |
+| 8 | **Response Format Configured** | Standard 4-field response format defined in `protocols/response_format.md`. | PASS / FAIL |
 | 9 | **Application Safety** | No user application files or code were modified or deleted. | PASS / FAIL |
-| 10 | **Fallback Documented** | Single-agent fallback role-switching mode documented in `docs/fallback-mode.md`. | PASS / FAIL |
+| 10 | **Native Subagent Docs** | Optional native subagent capabilities documented in `docs/advanced/native-agents.md`. | PASS / FAIL |
 
 ### Error Reporting (If Verification Fails):
 If any checkpoint fails, **DO NOT** output the standard success message. Output:
@@ -122,20 +120,17 @@ Action: [Remediation taken or needed]
 
 ---
 
-## 4. Platform-Specific Setup & Fallback Adaptation
+## 4. Platform-Specific Setup
 
 AI-Chief runs across diverse AI coding tools without relying on proprietary platform features:
 
-| Platform | Discovery Method | Execution Mode | Native Subagents? | Fallback Mode Required? |
-| :--- | :--- | :--- | :---: | :---: |
-| **Google Antigravity** | Auto-discovers `SKILL.md` & `AGENTS.md` | Subagent Mode via `invoke_subagent` | Yes | No (Optional) |
-| **Claude Code (Anthropic CLI)** | Reads `AGENTS.md` / `CLAUDE.md` / `@SKILL.md` | Role-switching inside session thread | No | **Yes** |
-| **OpenAI Codex / ChatGPT CLI** | Reads `AGENTS.md` via system prompt | Role-switching inside session thread | No | **Yes** |
-| **Cursor / Windsurf** | Reads `.cursorrules` / `.windsurfrules` | Role-switching inside Composer / Cascade | No | **Yes** |
-| **Gemini Coding Agents** | Reads `AGENTS.md` / `SKILL.md` in workspace | Role-switching or native tool dispatch | Depends on harness | **Yes** (Default) |
-| **Generic File-Reading AI Agents** | Reads `AGENTS.md` in root directory | Structured role-switching | No | **Yes** |
-
-> **Single-Agent Fallback Invariant:** On platforms where native subagents are unavailable, the AI model executes Chief → Manager → Worker → Summary via internal role switches tracked in [`runtime/current_agent.md`](file:///home/ishaan/Work/ai-chief/runtime/current_agent.md), adhering strictly to the identical protocol schemas without dumping raw logs to the user.
+| Platform | Primary Discovery Method | Execution Architecture |
+| :--- | :--- | :--- |
+| **Google Antigravity** | Auto-discovers `SKILL.md` & `AGENTS.md` | Single-agent OS prompt (optional `invoke_subagent` extensions) |
+| **Claude Code (Anthropic CLI)** | Reads `core/system-prompt.md` / `AGENTS.md` / `CLAUDE.md` | Single-agent 7-stage internal pipeline |
+| **OpenAI Codex / ChatGPT CLI** | Reads `core/system-prompt.md` via system prompt | Single-agent 7-stage internal pipeline |
+| **Cursor / Windsurf** | Loads `core/system-prompt.md` via `.cursorrules` / `.windsurfrules` | Single-agent 7-stage internal pipeline |
+| **Gemini Coding Agents** | Reads `core/system-prompt.md` / `SKILL.md` | Single-agent 7-stage internal pipeline |
 
 ---
 
@@ -158,7 +153,4 @@ Commands:
  /chief-memory — view saved memory
  /chief-plan — plan without executing
  /chief-build — execute approved tasks
-
-Your AI workflow is now:
-Chief → Manager → Worker → Summary
 ```

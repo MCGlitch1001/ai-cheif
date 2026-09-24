@@ -1,80 +1,59 @@
-# Fallback Mode: Operating in Single-Agent Environments
+# Single-Agent Architecture & Mode Transition
 
 ## 1. Overview
-While AI-Chief is designed to shine in multi-agent or subagent-capable environments (such as Google Antigravity or custom orchestration pipelines), **many AI coding environments only provide a single persistent conversation window** (e.g. basic chat interfaces, standard web LLMs, or single-process CLI agents).
+In AI-Chief, **single-agent execution is the native, default operating model**.
 
-**AI-Chief natively supports Single-Agent Fallback Mode.** In this mode, Chief, Manager, and Worker operate not as separate processes, but as **explicit, structured role switches** within the same conversation thread.
-
----
-
-## 2. Core Principle: Identical Protocols, Switched Mindsets
-
-Even in Fallback Mode:
-- **The protocols remain 100% identical.**
-- The model must still write bounded tasks using [`templates/task.md`](file:///home/ishaan/Work/ai-chief/templates/task.md).
-- The model must still generate execution reports using [`templates/worker_report.md`](file:///home/ishaan/Work/ai-chief/templates/worker_report.md).
-- The model must still compress worker outputs into 4-line status digests.
-- The human user still only sees the concise Chief response (<10 sentences).
+Rather than requiring complex multi-agent frameworks, separate processes, or simulating artificial agent conversations (*"Chief says...", "Manager says...", "Worker says..."*), AI-Chief operates as **one unified AI assistant** running a disciplined 7-stage internal execution pipeline.
 
 ---
 
-## 3. How Fallback Mode Works Step-by-Step
+## 2. Core Principle: One AI, Disciplined Internal Pipeline
 
-In a single-agent conversation turn, the AI model executes a three-phase cognitive loop internally:
+AI-Chief provides the rigor and context protection of multi-tiered workflows without conversational clutter:
+- **Unified Persona:** Speaks with one professional, high-signal voice.
+- **Internal Execution:** Context bounding, planning, code modifications, testing, and compression happen internally.
+- **Predictable Output:** Every technical deliverable adheres to the 4-field standard response schema: `Summary`, `Changes`, `Status`, `Next`.
+- **Filesystem Persistence:** Memory, architectural decisions (ADRs), and user preferences are written to disk in [`memory/`](file:///home/ishaan/Work/ai-chief/memory/).
+
+---
+
+## 3. How the Single-Agent Pipeline Operates
+
+In every conversation turn, the AI assistant internally transitions through 7 deterministic phases:
 
 ```
-[Phase A: Role = Chief]
-1. Parse user input.
-2. Formulate internal Chief → Manager directive.
-3. Update runtime/current_agent.md -> ACTIVE_AGENT: Manager.
+[Phase 1: Parse Intent]
+Analyze primary user goal, edge cases, and technical constraints.
 
-[Phase B: Role = Manager]
-1. Read memory/manager/*.md.
-2. Select files and write runtime/tasks/task-001.md.
-3. Update runtime/current_agent.md -> ACTIVE_AGENT: Worker.
+[Phase 2: Context & Config Ingestion]
+Read core/config.md, user preferences, and ADRs from memory/.
 
-[Phase C: Role = Worker]
-1. Read runtime/tasks/task-001.md.
-2. Perform file edits and terminal test commands.
-3. Formulate Worker execution report (COMPLETED, CHANGED, TESTS, ISSUES, NEXT STEPS).
-4. Update runtime/current_agent.md -> ACTIVE_AGENT: Manager.
+[Phase 3: Context Bounding]
+Identify and inspect strictly the minimal set of files required for the task.
 
-[Phase D: Role = Manager Compression]
-1. Ingest Worker execution report.
-2. Update memory/manager/project_state.md and active_tasks.md.
-3. Produce 4-line status digest (STATUS, DONE, IMPORTANT, NEXT).
-4. Update runtime/current_agent.md -> ACTIVE_AGENT: Chief.
+[Phase 4: Internal Planning]
+Formulate an atomic implementation sequence. (Halt here if /chief-plan).
 
-[Phase E: Role = Chief Delivery]
-1. Convert Manager digest into courteous, concise user response (<10 sentences).
-2. Emit ONLY the Chief response to the user.
+[Phase 5: Modular Execution]
+Perform modular, defensive code changes adhering to project conventions.
+
+[Phase 6: Verification & Testing]
+Run test suites, linters, or syntax checks internally to ensure zero regressions.
+
+[Phase 7: Semantic Compression & Response Delivery]
+Filter raw logs and deliver the standard 4-field response (Summary, Changes, Status, Next).
 ```
 
 ---
 
-## 4. Runtime Simulation Tracking
+## 4. Transitioning to Native Multi-Agent Orchestration
 
-To ensure transparency and state recovery, AI-Chief uses three files in `runtime/`:
+On platforms that feature **native, concurrent subagent execution engines** (such as Google Antigravity with `invoke_subagent`), AI-Chief can optionally distribute its internal pipeline stages into isolated background subagent processes.
 
-1. [`runtime/current_agent.md`](file:///home/ishaan/Work/ai-chief/runtime/current_agent.md):
-   ```markdown
-   ACTIVE_AGENT: Chief
-   CURRENT_TASK: Implementing JWT middleware
-   WAITING_FOR: Human feedback on OAuth options
-   LAST_ACTION: Reported task completion
-   ```
+In native multi-agent mode:
+- The parent session acts as the human interface and context controller.
+- Tasks are staged in `runtime/tasks/` and dispatched to disposable worker subagents.
+- Inter-agent messages remain completely internal to the tool layer.
+- The human user continues to receive the clean 4-field response format without conversational noise.
 
-2. [`runtime/active_session.md`](file:///home/ishaan/Work/ai-chief/runtime/active_session.md):
-   Tracks session metadata, task counts, and execution mode (`FALLBACK`).
-
-3. [`runtime/message_queue.md`](file:///home/ishaan/Work/ai-chief/runtime/message_queue.md):
-   Buffers inter-agent payloads if an action requires multiple sequential tool calls.
-
----
-
-## 5. Safeguards for Fallback Mode
-
-To maintain the integrity of AI-Chief in single-agent environments:
-1. **Never print internal churn:** Do not expose Manager task files or Worker reports directly to the user. Keep them in internal reasoning or file artifacts.
-2. **Always enforce Chief constraints in final output:** The final markdown emitted to the user must be under 10 sentences, contain no code blocks, and contain no raw log dumps.
-3. **Persist memory after every turn:** Always update `memory/manager/` files so that if the conversation is interrupted, the next turn resumes cleanly.
+See [`docs/advanced/native-agents.md`](file:///home/ishaan/Work/ai-chief/docs/advanced/native-agents.md) for complete details on configuring native subagent environments.

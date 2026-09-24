@@ -9,46 +9,56 @@ This guide walks you through what happens during your very first task after inst
 Once installed, issue your first engineering task by typing `/chief` followed by your goal:
 
 ```text
-/chief build a login system
+/chief build a login system using JWT
 ```
 
 ---
 
 ## 2. What Happens Behind the Scenes
 
-Notice how the work flows automatically through the 3-tier system without overwhelming your chat:
+Notice how the work flows automatically through AI-Chief's 7-stage internal execution pipeline without conversational noise:
 
 ```
-[User: /chief build a login system]
+[User: /chief build a login system using JWT]
                  │
                  ▼
      ┌───────────────────────┐
-     │ 1. Chief Receives     │ ──► Chief parses the intent, acknowledges briefly,
-     │    Request            │     and creates an internal directive for Manager.
-     └───────────┬───────────┘     (Chief never codes or runs terminal commands!)
+     │ 1. Parse Intent       │ ──► Identifies requirements: login endpoint, password
+     │                       │     hashing with bcrypt, signed JWT token generation.
+     └───────────┬───────────┘
                  │
                  ▼
      ┌───────────────────────┐
-     │ 2. Manager Prepares   │ ──► Manager reviews memory/manager/project_state.md,
-     │    Task & Bounds      │     curates target files (routes, models, controllers),
-     └───────────┬───────────┘     and stages runtime/tasks/task-001.md.
+     │ 2. Context & Config   │ ──► Reads core/config.md, user preferences, and ADRs
+     │                       │     from memory/ to ensure alignment with existing stack.
+     └───────────┬───────────┘
                  │
                  ▼
      ┌───────────────────────┐
-     │ 3. Worker Executes    │ ──► An isolated, disposable Worker writes code,
-     │                       │     executes unit tests, and verifies password hashing.
-     └───────────┬───────────┘     Worker formats a 5-field structured report.
+     │ 3. Bound Context      │ ──► Isolates only relevant target files: auth routes,
+     │                       │     user controller, and unit test suites.
+     └───────────┬───────────┘
                  │
                  ▼
      ┌───────────────────────┐
-     │ 4. Manager Compresses │ ──► Manager strips out verbose compiler and test output,
-     │    Output             │     updates memory/manager/active_tasks.md, and creates
-     └───────────┬───────────┘     a 4-line status summary for Chief.
+     │ 4. Plan Internally    │ ──► Formulates atomic implementation sequence.
+     └───────────┬───────────┘
                  │
                  ▼
      ┌───────────────────────┐
-     │ 5. Chief Replies      │ ──► Chief translates the summary into a clear, natural
-     │    Simply             │     message under 10 sentences without code dumps.
+     │ 5. Execute Code       │ ──► Writes clean, modular code with defensive error
+     │                       │     handling for missing passwords or invalid logins.
+     └───────────┬───────────┘
+                 │
+                 ▼
+     ┌───────────────────────┐
+     │ 6. Verify with Tests  │ ──► Runs test suites internally, verifying 200 OK on valid
+     │                       │     login and 401 Unauthorized on invalid passwords.
+     └───────────┬───────────┘
+                 │
+                 ▼
+     ┌───────────────────────┐
+     │ 7. Deliver Response   │ ──► Emits clean 4-field standard response.
      └───────────────────────┘
 ```
 
@@ -56,17 +66,28 @@ Notice how the work flows automatically through the 3-tier system without overwh
 
 ## 3. What You See in the Chat
 
-Unlike traditional AI coding sessions that dump 200 lines of terminal output, file diffs, and debugging trial-and-error directly into your chat, you receive a clean, executive summary:
+Unlike traditional AI coding sessions that dump walls of raw terminal logs, messy diffs, or simulated agent churn (*"Chief says...", "Worker says..."*), you receive a clean 4-field update:
 
-> **Chief:**
-> "I have had our engineering team build the login system. We created the authentication route handling user login, securely verify passwords using bcrypt, and issue signed JWT tokens on success. All 6 automated authentication tests passed cleanly.
->
-> Please ensure you add a `JWT_SECRET` variable to your `.env` file before deploying to staging. Would you like us to proceed with password reset endpoints next?"
+```markdown
+Summary:
+Implemented the login system with secure password verification via bcrypt and signed JWT token issuance.
+
+Changes:
+- src/routes/auth.ts (New POST /api/login endpoint)
+- src/controllers/auth.ts (Password comparison and JWT signing logic)
+- tests/auth.test.ts (Unit tests validating successful login and rejection of bad credentials)
+
+Status:
+Completed
+
+Next:
+Ensure `JWT_SECRET` is defined in your `.env` file, then run `npm test` to verify your environment.
+```
 
 ---
 
 ## 4. Key Takeaways from Your First Run
 
-1. **Clean Conversation:** You only communicate with Chief. No spam, no raw diffs, no wall-of-logs.
-2. **Context Integrity:** Because the Worker operated in an isolated scope and Manager compressed its output, your LLM's context window remains 95% empty, preserving reasoning power for complex future tasks.
-3. **Persistent State:** If you restart your IDE or close your session, your project's architectural decisions and progress remain safely written to `memory/`.
+1. **Zero Conversational Churn:** No fake dialogues, no intermediate tool spam, no wall-of-logs.
+2. **Context Integrity:** Because context is bounded and reasoning is kept internal, your LLM's context window remains clean, preserving reasoning power for future tasks.
+3. **Persistent State:** If you restart your IDE or close your session, project decisions and task logs remain safely written to `memory/`.

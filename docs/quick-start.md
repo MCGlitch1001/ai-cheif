@@ -6,52 +6,75 @@ Get started with **AI-Chief** in under five minutes.
 
 ## What is AI-Chief in 30 Seconds?
 
-Most AI coding agents mix human conversation, project planning, terminal commands, and multi-thousand-line logs into one single messy context window. Eventually, the agent gets confused, loses your original instructions, and hallucinates.
+Most AI coding agents mix human conversation, raw code searches, terminal commands, and verbose logs into one messy context window. Eventually, the agent gets confused, loses instructions, or hallucinates changes.
 
-**AI-Chief fixes this by separating work into three tiers:**
-1. **Chief:** You talk only to Chief. Chief speaks clearly, never writes code, and never dumps logs.
-2. **Manager:** Plans the work, selects files, and supervises disposable workers.
-3. **Worker:** Writes code, runs tests, and reports back. Discarded immediately after.
+**AI-Chief fixes this by running as a structured AI operating system:**
+- **Single AI assistant:** No fake agent chatter (*no "Chief says...", "Worker says..."*).
+- **7-Stage internal pipeline:** Understands intent, checks context, bounds files, plans internally, executes code, verifies tests, and compresses output.
+- **Predictable output:** Clean 4-field standard format (`Summary`, `Changes`, `Status`, `Next`).
+- **Filesystem-first memory:** Architectural decisions and user preferences persist on disk.
 
 ---
 
 ## 1-Minute Setup
 
-Choose the installation method that fits your workflow:
+### Option A: The 1-Line Installer (Recommended)
+Paste this into your AI coding assistant:
+```text
+Install AI-Chief into this project.
+```
 
-### Option A: Clone into your repository
+### Option B: Point to the System Prompt
+Tell your assistant:
+```text
+Load AI-Chief system prompt from core/system-prompt.md
+```
+
+### Option C: Clone into your repository
 ```bash
 git clone https://github.com/MCGlitch1001/ai-cheif.git .ai-chief
 ```
-
-### Option B: Copy into existing project
-Copy the `ai-chief/` folder directly into your project root.
-
-### Option C: Point your AI tool to SKILL.md
-If using Google Antigravity, Claude Code, or Cursor, tell your assistant:
-> *"Load AI-Chief using `SKILL.md`."*
 
 ---
 
 ## Your First 3 Commands
 
-### 1. Activate Chief
+### 1. Execute a Task
 ```text
-/chief
+/chief add health check endpoint returning uptime and status 200
 ```
-> **Chief:** *"Hello! I'm Chief. I'm here to coordinate engineering tasks for you. What would you like to build or improve today?"*
 
-### 2. Plan a Feature Safely
-```text
-/chief-plan add health check endpoint to our server
-```
-> **Chief:** *"I've had the manager analyze the server structure. We've queued a single task to add a GET `/health` endpoint returning server uptime and status code 200, covered by a unit test. Would you like us to proceed with `/chief-build`?"*
+AI-Chief runs its internal pipeline and responds:
 
-### 3. Build & Verify
-```text
-/chief-build
+```markdown
+Summary:
+Added a GET /health endpoint returning current server uptime and 200 OK status.
+
+Changes:
+- src/routes/health.ts (New route handler)
+- src/app.ts (Mounted health router at /health)
+- tests/health.test.ts (Unit test validating response payload and status)
+
+Status:
+Completed
+
+Next:
+Run `npm test` to verify your test suite passes.
 ```
-> **Chief:** *"The team has implemented the `/health` endpoint in `src/routes/health.ts` and wired it into `src/app.ts`. All test suites passed with 100% coverage. Everything is ready for deployment."*
+
+### 2. Plan Without Touching Code
+```text
+/chief-plan refactor database queries to use connection pooling
+```
+
+AI-Chief plans the architectural roadmap and queues proposed tasks in `memory/manager/active_tasks.md` without editing any source files.
+
+### 3. Check Current Status
+```text
+/chief-status
+```
+
+AI-Chief inspects persistent memory and provides a concise snapshot of active tasks and project milestones.
 
 ---
 
@@ -59,13 +82,13 @@ If using Google Antigravity, Claude Code, or Cursor, tell your assistant:
 
 | Command | Action |
 | :--- | :--- |
-| `/chief [goal]` | Normal activation (loads filesystem rules) |
-| `/chief+ [goal]` | Force full reload (recovers degraded context) |
-| `/chief-status` | See what the team is doing |
+| `/chief [goal]` | Normal activation (executes via 7-stage internal pipeline) |
+| `/chief+ [goal]` | Force full reload (recovers degraded context from filesystem) |
+| `/chief-status` | See project status and active tasks from memory |
 | `/chief-plan [goal]` | Plan without touching code |
 | `/chief-build [task]` | Execute code modifications |
 | `/chief-clean` | Compact and tidy up memory |
 | `/chief-memory` | View stored preferences and ADRs |
-| `/chief-reset` | Clear temporary scratchpad files |
+| `/chief-reset` | Clear temporary staging files |
 
 *That's it! You're ready to use AI-Chief.*

@@ -1,250 +1,160 @@
-# AI-Chief 🎖️ (v0.3)
+# AI-Chief 🎖️
 
-> **A portable, tool-agnostic AI agent orchestration framework and communication layer between humans and AI workers.**
+> **A portable, lightweight AI operating system prompt and disciplined internal execution framework.**
 
-[![Version](https://img.shields.io/badge/version-v0.3.0-blue.svg)](https://github.com/MCGlitch1001/ai-cheif)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](file:///home/ishaan/Work/ai-chief/LICENSE)
-[![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Markdown)-brightgreen.svg)](#installation-methods)
-[![Architecture](https://img.shields.io/badge/architecture-3--Tier%20Stratified-orange.svg)](file:///home/ishaan/Work/ai-chief/docs/architecture.md)
+[![Zero Dependencies](https://img.shields.io/badge/dependencies-0%20(Pure%20Markdown)-brightgreen.svg)](#install-ai-chief)
+[![Architecture](https://img.shields.io/badge/architecture-Single--Agent%20OS%20Prompt-orange.svg)](file:///home/ishaan/Work/ai-chief/docs/architecture.md)
 
 ---
 
 ## 1. What is AI-Chief?
 
-**AI-Chief** is a lightweight, zero-dependency orchestration framework that bridges the gap between human developers and AI coding agents.
+**AI-Chief** is a lightweight, zero-dependency AI operating system prompt and execution framework that bridges the gap between human developers and AI coding assistants.
 
-Rather than having a single AI model attempt to chat with you, navigate your codebase, write code, run builds, debug failures, and dump thousands of lines of terminal output into a single conversation, AI-Chief stratifies work into three specialized tiers:
-- **Chief Agent (Tier 1):** Your personal communication partner. Speaks naturally, concisely (<10 sentences), and empathetically. **Chief never writes code, inspects repos, or dumps logs.**
-- **Manager Agent (Tier 2):** The permanent intelligence and context controller. Understands your request, curates bounded context for workers, orchestrates execution, compresses verbose technical outputs, and maintains Git-versioned Markdown memory.
-- **Worker Agent (Tier 3):** Disposable execution engines. Spawned with an atomic task, inspect files, code, run tests, debug, and submit a structured report before self-terminating.
-- **Cleaner Agent (Auxiliary):** Performs memory maintenance and garbage collection to keep context windows lean.
+AI-Chief is **one single AI assistant** operating with an internal execution framework. It is **NOT** a collection of fake agents talking to each other. You will never see simulated role tags like *"Chief says..."*, *"Manager says..."*, or *"Worker says..."*, and you will never be bombarded with intermediate terminal churn.
 
----
-
-## 2. Why Does AI-Chief Exist?
-
-Monolithic AI coding agents suffer from two systemic issues:
-1. **Context Pollution & Token Exhaustion:** When an agent reads multiple large files and runs test suites that dump hundreds of lines of output, the LLM's context window degrades rapidly. The agent loses track of early instructions, begins hallucinating, and becomes prohibitively expensive.
-2. **Poor User Experience:** Developers are forced to sift through walls of raw diffs, build logs, and internal trial-and-error churn just to understand if a feature works.
-
-**AI-Chief solves this by design:**
-- **Zero API/Plugin Lock-in:** AI-Chief works through clear instructions, markdown memory, and standardized protocols—not proprietary plugins, binary CLIs, or cloud databases.
-- **Context Firewalling:** Workers only receive the exact files needed. Raw logs are absorbed and compressed by Manager before reaching Chief.
-- **Human-First Communication:** The human only interacts with Chief, receiving polished, high-signal updates.
+Instead, AI-Chief runs a structured 7-stage internal operating pipeline:
+1. **Understand user intent:** Isolate core goals, edge cases, and constraints.
+2. **Context check:** Inspect configuration and persistent Markdown memory on disk.
+3. **Bound files:** Identify the minimal file set needed, avoiding context pollution.
+4. **Plan internally:** Formulate an atomic execution sequence.
+5. **Execute cleanly:** Make modular, defensive code changes.
+6. **Verify:** Validate with tests, syntax checkers, or linters.
+7. **Summarize:** Deliver a clean, predictable human-friendly response.
 
 ```
-                  ┌──────────────────────┐
-                  │      Human User      │
-                  └──────────┬───────────┘
-                             │ Natural Conversation (<10 sentences)
-                             ▼
-                  ┌──────────────────────┐
-                  │     Chief Agent      │
-                  │   (Human Interface)  │
-                  └──────────┬───────────┘
-                             │ User Intent / Delegated Goal
-                             ▼
-                  ┌──────────────────────┐
-                  │    Manager Agent     │◄────────┐
-                  │  (Context & Memory)  │         │
-                  └──────────┬───────────┘         │
-                             │ Task / Context / Boundaries
-                             ▼                     │
-                  ┌──────────────────────┐         │
-                  │   Disposable Worker  │         │
-                  │  (Execution / Tools) │         │
-                  └──────────┬───────────┘         │
-                             │ Detailed Raw Output │
-                             ▼                     │
-                  ┌──────────────────────┐         │
-                  │ Manager Compression  ├─────────┘
-                  │  & Memory Updating   │
-                  └──────────┬───────────┘
-                             │ High-Signal Status (STATUS, DONE, IMPORTANT, NEXT)
-                             ▼
-                  ┌──────────────────────┐
-                  │     Chief Agent      │
-                  └──────────┬───────────┘
-                             │ Concise Human Update
-                             ▼
-                  ┌──────────────────────┐
-                  │      Human User      │
-                  └──────────────────────┘
+                    ┌────────────────────────┐
+                    │       Human User       │
+                    └───────────┬────────────┘
+                                │ Command (/chief, /chief-build, etc.)
+                                ▼
+                    ┌────────────────────────┐
+                    │ AI-Chief System Prompt │ (core/system-prompt.md)
+                    └───────────┬────────────┘
+                                │
+                                ▼
+                    ┌────────────────────────┐
+                    │   Internal Execution   │
+                    │       Framework        │ (7-Stage Pipeline)
+                    │  (Understand ➔ Plan    │
+                    │   ➔ Bound ➔ Execute    │
+                    │   ➔ Test ➔ Compress)   │
+                    └───────────┬────────────┘
+                                │ High-Signal Response
+                                ▼
+                    ┌────────────────────────┐
+                    │     Human Response     │ (Summary / Changes / Status / Next)
+                    └────────────────────────┘
 ```
 
 ---
 
-## Install AI-Chief
+## 2. Why AI-Chief?
 
-New users should not manually configure files.
+Standard AI coding agents suffer from two major failure modes:
+1. **Context Bloat & Forgetting:** Over long sessions, conversation history overflows. The model forgets constraints, hallucinates previously discussed rules, or drifts off course.
+2. **Conversational Churn:** The model floods the chat with internal monologues, half-baked reasoning, massive stack traces, and messy diffs.
+
+**AI-Chief solves both:**
+- **The Filesystem Rule:** *The conversation is temporary. The filesystem is the source of truth.* Instructions, architectural decisions (ADRs), and user preferences live permanently in Markdown files on disk.
+- **High-Signal Output Schema:** All technical deliverables conclude with a 4-field standard response: `Summary`, `Changes`, `Status`, and `Next`.
+- **Zero API/Plugin Lock-in:** 100% portable Markdown. Works seamlessly in Claude Code, Google Antigravity, OpenAI Codex, Cursor, Windsurf, or Gemini CLI.
+
+---
+
+## 3. Install AI-Chief
+
+Installing AI-Chief is completely automated and non-destructive.
 
 ### 1-Line Installation Flow:
-1. **Paste the installer prompt into your AI coding tool:**
+1. **Paste this single prompt into your AI coding tool:**
    ```text
    Install AI-Chief into this project.
    ```
-2. **AI installs AI-Chief:** The AI assistant reads [`install.md`](file:///home/ishaan/Work/ai-chief/install.md), scaffolds the directory structure, initializes memory, and confirms with the standard onboarding summary.
-3. **Use immediately:**
+2. **AI configures AI-Chief:** The assistant reads [`install.md`](file:///home/ishaan/Work/ai-chief/install.md), scaffolds `core/`, `memory/`, and `protocols/`, runs a 10-point self-audit, and responds:
+   ```
+   ✅ AI-Chief installed successfully.
+
+   AI-Chief is ready.
+
+   Start:
+    /chief <your task>
+
+   Commands:
+    /chief-reset — reset temporary session data
+    /chief-clean — clean and organize memory
+    /chief-status — view project status
+    /chief-memory — view saved memory
+    /chief-plan — plan without executing
+    /chief-build — execute approved tasks
+   ```
+3. **Alternatively, point your assistant directly to the system prompt:**
    ```text
-   /chief <your task>
+   Load AI-Chief system prompt from core/system-prompt.md
    ```
 
-*(See [`install.md`](file:///home/ishaan/Work/ai-chief/install.md) and [`docs/installation.md`](file:///home/ishaan/Work/ai-chief/docs/installation.md) for complete details.)*
+*(See [`docs/installation.md`](file:///home/ishaan/Work/ai-chief/docs/installation.md) for full setup instructions.)*
 
 ---
 
-### Alternative Manual Installation Methods
+## 4. How to Use
 
-AI-Chief requires **no node modules, no python environments, and no hosted servers**. If preferred, you can also install manually:
-
-#### Method 1: Clone Repository into a Project
-Clone AI-Chief directly into your existing project or workspace:
-```bash
-git clone https://github.com/MCGlitch1001/ai-cheif.git .ai-chief
-```
-
-#### Method 2: Copy `ai-chief` Folder into an Existing Project
-Copy the `ai-chief/` directory directly into the root of your existing codebase:
-```bash
-cp -r /path/to/ai-chief /path/to/your-project/ai-chief
-```
-
-#### Method 3: Point an AI Tool to `SKILL.md`
-If you are using an AI coding tool that supports skill or rule loading (Google Antigravity, Claude Code, Cursor, Windsurf):
-- Point your assistant to [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) or [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md).
-- In Antigravity: Placed automatically in your workspace skills.
-- In Claude Code / Cursor: Reference `@SKILL.md` or `@AGENTS.md` in your instructions.
-
-> [!NOTE]
-> AI-Chief operates entirely through structured instructions, file-based memory, and text protocols. It requires zero third-party integrations or API keys to function.
-
----
-
-## 4. How to Activate
-
-Once installed in your project, activate AI-Chief in your chat interface:
-
+### Normal Activation:
 ```text
-/chief
+/chief add JWT authentication to our Express routes
 ```
 
-The AI assistant will:
-1. Load directives from [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) and [`agents/chief.md`](file:///home/ishaan/Work/ai-chief/agents/chief.md).
-2. Adopt the Chief persona.
-3. Greet you concisely and ask how it can coordinate the engineering team for you.
+AI-Chief runs its internal pipeline and replies using the standard format:
+
+```markdown
+Summary:
+Implemented JWT authentication middleware and wired verification across protected API endpoints.
+
+Changes:
+- src/middleware/auth.ts (New JWT verification middleware)
+- src/routes/api.ts (Protected routes with auth middleware)
+- tests/auth.test.ts (Unit tests validating token parsing and expiration)
+
+Status:
+Completed
+
+Next:
+Run `npm test` to verify your test suite, and ensure `JWT_SECRET` is set in your `.env`.
+```
 
 ---
 
-## 5. Example Workflow
+## 5. Command System
 
-### 1. You Issue a Command:
-```text
-/chief Add authentication using JWT to our Express app
-```
-
-### 2. Chief Acknowledges & Delegates:
-Chief confirms your request in 2 sentences and internally alerts Manager:
-```markdown
-USER REQUEST: Add authentication using JWT to Express app
-CONSTRAINTS: Production Express server, TypeScript
-PRIORITY: NORMAL
-```
-
-### 3. Manager Plans & Bounds Context:
-Manager inspects [`memory/manager/project_state.md`](file:///home/ishaan/Work/ai-chief/memory/manager/project_state.md), identifies `src/server.ts`, and writes `runtime/tasks/task-001.md`:
-```markdown
-TASK: Implement JWT authentication middleware
-CONTEXT: Express 4.x with TypeScript. Secret stored in process.env.JWT_SECRET.
-FILES: src/middleware/auth.ts, src/server.ts, test/auth.test.ts
-EXPECTED RESULT: 401 on missing token; valid token attaches user. Tests pass.
-LIMITATIONS: Use jsonwebtoken; do not install passport.
-```
-
-### 4. Worker Executes & Reports:
-A disposable Worker is instantiated. It creates `auth.ts`, modifies `server.ts`, runs `npm test`, and outputs:
-```markdown
-COMPLETED: Implemented JWT authentication middleware and wired to protected routes.
-CHANGED: src/middleware/auth.ts (NEW), src/server.ts (MODIFIED), test/auth.test.ts (NEW)
-TESTS: npm test test/auth.test.ts passed (5/5 assertions green).
-ISSUES: None. Handled token expiration explicitly.
-NEXT STEPS: Wire user registration and login endpoints.
-```
-*(Worker self-terminates)*
-
-### 5. Manager Compresses & Syncs Memory:
-Manager updates [`memory/manager/active_tasks.md`](file:///home/ishaan/Work/ai-chief/memory/manager/active_tasks.md) and formats a 4-line digest for Chief:
-```markdown
-STATUS: SUCCESS
-DONE: JWT authentication middleware implemented and validated with 5 unit tests.
-IMPORTANT: Requires JWT_SECRET to be configured in .env.
-NEXT: Implement user registration and login endpoints.
-```
-
-### 6. Chief Delivers the Final Answer:
-> **Chief:** *"I've had the engineering team implement JWT authentication middleware and hook it into your protected routes. All 5 test suites passed cleanly. Before we move on to login endpoints, please ensure `JWT_SECRET` is defined in your `.env` file. Would you like us to proceed with user login routes next?"*
-
----
-
-## 6. Command System
-
-AI-Chief includes 8 built-in text commands:
+AI-Chief includes built-in portable text commands:
 
 | Command | Usage | Description |
 | :--- | :--- | :--- |
-| `/chief` | `/chief [request]` | Normal activation. Loads framework files from disk and initiates work. |
-| `/chief+` | `/chief+ [request]` | Full reload. Forces cold-start resync when context is degraded or compressed. |
+| `/chief` | `/chief [request]` | Normal activation. Executes request through the 7-stage internal pipeline. |
+| `/chief+` | `/chief+ [request]` | Full framework reload. Forces cold-start resync when context is degraded or compressed. |
 | `/chief-status` | `/chief-status` | Returns a concise overview of current project state and task list. |
-| `/chief-plan` | `/chief-plan [goal]` | Decomposes a goal into a proposed task list without executing code. |
-| `/chief-build` | `/chief-build [task]` | Authorizes Manager to dispatch Worker agents to execute changes. |
-| `/chief-clean` | `/chief-clean` | Activates Cleaner Agent to deduplicate and compact memory. |
+| `/chief-plan` | `/chief-plan [goal]` | Decomposes a goal into an architectural plan without executing code. |
+| `/chief-build` | `/chief-build [task]` | Executes planned or requested technical modifications. |
+| `/chief-clean` | `/chief-clean` | Deduplicates and compacts compressible memory files. |
 | `/chief-memory` | `/chief-memory` | Displays stored preferences, project overview, and key ADR decisions. |
-| `/chief-reset` | `/chief-reset` | Clears temporary task files in `runtime/tasks/`. |
+| `/chief-reset` | `/chief-reset` | Clears temporary task staging files in `runtime/tasks/`. |
 
 ---
 
-## 7. Memory Architecture (Filesystem-First)
-
-> **Core Principle:** *The conversation is temporary. The filesystem is the source of truth.*
-
-```
-Tier 1: Immutable Instructions (Never compressed or deleted)
-├── SKILL.md (Entry point)
-├── AGENTS.md (Root governance)
-├── Agent definitions (agents/chief.md, manager.md, worker.md, cleaner.md)
-└── Communication protocols (protocols/)
-
-Tier 2: Persistent Knowledge (Survives sessions & platform switches)
-├── User preferences (memory/chief/preferences.md)
-├── Architecture decisions (memory/manager/decisions.md)
-├── Project state & milestones (memory/manager/project_state.md)
-└── Project overview (memory/project/overview.md)
-
-Tier 3: Temporary Context (Only this tier may be compressed)
-├── Active conversations (memory/chief/conversation_state.md)
-├── Worker reports (compressed by Manager into high-signal summaries)
-├── Temporary logs & closed tasks (memory/manager/active_tasks.md)
-└── Staging task files (runtime/tasks/) — safe to purge via /chief-reset
-```
-
-See [`protocols/memory_rules.md`](file:///home/ishaan/Work/ai-chief/protocols/memory_rules.md) and [`docs/persistent-context.md`](file:///home/ishaan/Work/ai-chief/docs/persistent-context.md) for details.
-
----
-
-## 8. Directory Structure
+## 6. Directory Structure
 
 ```
 ai-chief/
+├── core/                                    # Core AI Operating System Prompt & Config
+│   ├── system-prompt.md                     # Main single-agent OS prompt
+│   └── config.md                            # Editable user settings (tone, max sentences, risk)
+│
 ├── AGENTS.md                                # Root directives, governance, and command mapping
-├── README.md                                # Full framework overview, lifecycle, and command table
-├── SKILL.md                                 # Skill guide with command triggers and agent contracts
+├── README.md                                # Full framework overview and documentation
+├── SKILL.md                                 # Skill entry point and discovery rules
 ├── LICENSE                                  # MIT License
 ├── install.md                               # Automated 1-line installation specification
-│
-├── agents/                                  # Agent personas and operational contracts
-│   ├── chief.md                             # Human interface (<10 sentences, non-coding)
-│   ├── manager.md                           # Context controller & permanent memory keeper
-│   ├── worker.md                            # Ephemeral execution engine (code, tools, tests)
-│   └── cleaner.md                           # Memory hygiene, deduplication, and compaction
 │
 ├── memory/                                  # Pure Markdown persistent memory
 │   ├── chief/
@@ -257,25 +167,22 @@ ai-chief/
 │   └── project/
 │       └── overview.md                      # Global project goals and domain context
 │
-├── runtime/                                 # Runtime simulation & task staging
+├── runtime/                                 # Ephemeral runtime staging
 │   ├── active_session.md                    # Active session state & telemetry
-│   ├── current_agent.md                     # Active agent tracking for Fallback Mode
-│   ├── message_queue.md                     # Simulated inter-agent message buffer
-│   └── tasks/                               # Ephemeral staging for worker task files
+│   └── tasks/                               # Ephemeral staging for task files
 │       └── README.md
 │
-├── protocols/                               # Rigid inter-agent communication specifications
+├── protocols/                               # Communication & execution specifications
 │   ├── activation.md                        # Persistent activation & 6-step bootstrap protocol
 │   ├── context_recovery.md                  # Self-healing reload triggers & /chief+
-│   ├── commands.md                          # Portable command protocol (/chief, /chief+, etc.)
-│   ├── delegation.md                        # Manager ↔ Worker and Manager ↔ Chief contracts
+│   ├── commands.md                          # Portable command protocol specifications
+│   ├── response_format.md                   # Standard 4-field output schema
 │   ├── compression.md                       # Output compression algorithms and boundaries
 │   ├── memory_rules.md                      # 3-tier memory durability hierarchy rules
-│   └── response_format.md                   # Exact output schemas across all tiers
+│   └── delegation.md                        # Task specifications & delegation schemas
 │
 ├── templates/                               # Operational Markdown templates
-│   ├── task.md                              # Manager → Worker task definition template
-│   ├── worker_report.md                     # Worker → Manager execution report template
+│   ├── task.md                              # Task definition template
 │   └── memory_update.md                     # ADR and task status update templates
 │
 ├── config/
@@ -284,27 +191,28 @@ ai-chief/
 └── docs/                                    # Documentation library
     ├── README.md                            # Documentation index
     ├── installation.md                      # 1-line installation guide & safety rules
-    ├── platforms.md                         # Cross-platform compatibility & verification matrix
-    ├── first-run.md                         # First run experience & lifecycle walkthrough
+    ├── platforms.md                         # Cross-platform compatibility matrix
+    ├── first-run.md                         # First run experience & walkthrough
     ├── quick-start.md                       # 5-minute onboarding guide
     ├── user-guide.md                        # Comprehensive user guide
-    ├── persistent-context.md                # Chat truncation survival & recovery guide
-    ├── lifecycle.md                         # 7-stage execution lifecycle guide
+    ├── persistent-context.md                # Context survival & recovery guide
+    ├── lifecycle.md                         # 7-stage internal execution pipeline
     ├── commands.md                          # User commands & cross-tool integration guide
-    ├── fallback-mode.md                     # Single-agent fallback operating instructions
-    ├── architecture.md                      # Deep architectural whitepaper
-    └── release-checklist.md                 # v0.3 public release checklist
+    ├── architecture.md                      # Architectural whitepaper
+    └── advanced/
+        └── native-agents.md                 # Optional native multi-agent orchestration
 ```
 
 ---
 
-## 9. Operating Modes
+## 7. Optional Native Multi-Agent Orchestration
 
-- **Subagent Mode:** Used in environments supporting background subagents (Google Antigravity, custom harnesses). Workers execute concurrently or in isolated threads.
-- **Fallback Mode:** Used in single-agent environments (standard CLI / Web chat). Chief, Manager, and Worker operate through structured cognitive role switches tracked in [`runtime/current_agent.md`](file:///home/ishaan/Work/ai-chief/runtime/current_agent.md). See [`docs/fallback-mode.md`](file:///home/ishaan/Work/ai-chief/docs/fallback-mode.md).
+While AI-Chief operates out-of-the-box as a single unified assistant, platforms featuring **native background subagent processes** (e.g., Google Antigravity with `invoke_subagent`) can optionally distribute internal pipeline stages across isolated subagents.
+
+See [`docs/advanced/native-agents.md`](file:///home/ishaan/Work/ai-chief/docs/advanced/native-agents.md) for full architectural patterns and implementation details.
 
 ---
 
-## 10. License
+## 8. License
 
 MIT License. Free for personal and commercial use.

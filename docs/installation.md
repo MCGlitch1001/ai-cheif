@@ -12,6 +12,11 @@ To install AI-Chief into any codebase or repository, paste this single line into
 Install AI-Chief into this project.
 ```
 
+Alternatively, you can instruct your agent:
+```text
+Load AI-Chief system prompt from core/system-prompt.md
+```
+
 ---
 
 ## 2. What the AI Does During Installation
@@ -19,10 +24,10 @@ Install AI-Chief into this project.
 When your AI assistant reads this instruction, it executes the automated protocol specified in [`install.md`](file:///home/ishaan/Work/ai-chief/install.md):
 
 1. **Pre-Installation Safety Inspection:** Checks if an existing `ai-chief/` setup is present. If found, it preserves existing user memory and preferences.
-2. **Non-Destructive Directory Scaffolding:** Creates the 3-tier folder hierarchy (`agents/`, `memory/`, `runtime/tasks/`, `protocols/`, `templates/`, `config/`, `docs/`).
-3. **Core Directive Deployment:** Ensures [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md), [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md), and all agent contracts (`chief.md`, `manager.md`, `worker.md`, `cleaner.md`) are established.
+2. **Non-Destructive Directory Scaffolding:** Creates the required folder hierarchy (`core/`, `agents/`, `memory/`, `runtime/tasks/`, `protocols/`, `templates/`, `config/`, `docs/advanced/`).
+3. **Core Directive Deployment:** Ensures [`core/system-prompt.md`](file:///home/ishaan/Work/ai-chief/core/system-prompt.md), [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md), [`AGENTS.md`](file:///home/ishaan/Work/ai-chief/AGENTS.md), and [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) are established.
 4. **Persistent Memory Initialization:** Creates pristine Markdown memory files in `memory/` without touching any of your application source code.
-5. **10-Point Lightweight Self-Audit:** Verifies that all files exist, references resolve cleanly, and fallback mode is configured.
+5. **10-Point Lightweight Self-Audit:** Verifies that all files exist, references resolve cleanly, and operational bounds are primed.
 6. **Standard Onboarding Response:** Concludes with the fixed summary block.
 
 ---
@@ -46,25 +51,22 @@ Commands:
  /chief-memory — view saved memory
  /chief-plan — plan without executing
  /chief-build — execute approved tasks
-
-Your AI workflow is now:
-Chief → Manager → Worker → Summary
 ```
 
 ---
 
-## 4. Execution Modes: Native Subagents vs. Single-Agent Fallback
+## 4. Execution Architecture
 
-AI-Chief supports two distinct operational modes depending on your AI platform:
+AI-Chief provides a unified, structured workflow:
 
-### Mode A: Native Subagents (Multi-Agent Platforms)
-- **Supported on:** Google Antigravity, custom subagent harnesses.
-- **How it works:** Chief, Manager, and Worker run as distinct background subagent processes. The Worker executes tasks in an isolated sub-thread, keeping the parent chat completely pristine.
+### Single-Agent Operating System (Default)
+- **Supported on:** Claude Code, OpenAI Codex, Cursor (Composer), Windsurf, Google Antigravity, Gemini CLI, standard chat interfaces.
+- **How it works:** The AI assistant runs the 7-stage internal pipeline (`Intent → Context Check → Bounding → Internal Plan → Execute → Verify → Summarize`).
+- **User Interface:** Zero simulated agent chatter (no *"Chief says..."*, *"Worker says..."*). Output is delivered in the standard 4-field format (`Summary`, `Changes`, `Status`, `Next`).
 
-### Mode B: Single-Agent Fallback (Single-Thread Platforms)
-- **Supported on:** Claude Code, OpenAI Codex, Cursor (Composer), Gemini CLI, standard chat interfaces.
-- **How it works:** The AI assistant switches cognitive roles internally (`Chief → Manager → Worker → Summary`) within the same conversation thread, updating [`runtime/current_agent.md`](file:///home/ishaan/Work/ai-chief/runtime/current_agent.md).
-- **Protocol Guarantee:** The communication schemas, context bounding, and `<10 sentences` Chief non-coding boundary remain **100% identical**. See [`docs/fallback-mode.md`](file:///home/ishaan/Work/ai-chief/docs/fallback-mode.md) for complete details.
+### Optional: Native Multi-Agent Orchestration
+- **Supported on:** Harnesses with native subagent IPC (e.g., Google Antigravity `invoke_subagent`).
+- **How it works:** The orchestrator disposes background subagents for isolated task execution while keeping user chat clean. See [`docs/advanced/native-agents.md`](file:///home/ishaan/Work/ai-chief/docs/advanced/native-agents.md).
 
 ---
 
@@ -85,7 +87,7 @@ To manually verify that AI-Chief was installed correctly in your repository:
 
 1. **Verify Files Exist:**
    ```bash
-   ls -la AGENTS.md SKILL.md agents/ protocols/ memory/ runtime/
+   ls -la core/ AGENTS.md SKILL.md protocols/ memory/ runtime/
    ```
 2. **Run a Dry-Run Activation:**
    Type `/chief-status` in your chat. The model should read `memory/manager/project_state.md` and report a clean status snapshot.
@@ -98,30 +100,7 @@ To manually verify that AI-Chief was installed correctly in your repository:
 
 ## 7. Troubleshooting Failed Installations
 
-| Symptom | Cause | Solution |
-| :--- | :--- | :--- |
-| **Model writes code to chat during install** | Model did not follow `install.md` | Re-issue: *"Read install.md and install AI-Chief non-destructively."* |
-| **Missing directory error** | Filesystem permissions or restricted environment | Ensure the AI has write permissions to create subdirectories. |
-| **Existing memory overwritten** | Partial re-installation | Restore memory from Git: `git checkout memory/` or check `runtime/current_agent.md`. |
-| **Model dumps internal logs** | Model slipping out of Chief persona | Issue `/chief+` to trigger a cold-start filesystem reload. |
-| **Platform lacks subagent support** | Normal for CLI/single-thread tools | Explicitly tell model: *"Operate in Fallback Mode using docs/fallback-mode.md."* |
-
----
-
-## 8. Alternative Manual Installation Methods
-
-If you prefer manual installation without prompting an agent:
-
-### Method 1: Git Clone
-```bash
-git clone https://github.com/MCGlitch1001/ai-cheif.git .ai-chief
-```
-
-### Method 2: Copy Directory
-Copy the `ai-chief/` directory directly into your repository:
-```bash
-cp -r /path/to/ai-chief /path/to/your-project/ai-chief
-```
-
-### Method 3: Point Your AI to `SKILL.md`
-In environments like Google Antigravity, simply load [`SKILL.md`](file:///home/ishaan/Work/ai-chief/SKILL.md) directly into your active workspace skills.
+If your AI assistant returns `❌ AI-Chief installation incomplete`:
+- Verify write permissions in the project directory.
+- Confirm all files in `core/` and `protocols/` were created.
+- Type `/chief+` to force a complete filesystem re-sync.

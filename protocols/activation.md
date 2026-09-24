@@ -34,39 +34,39 @@ When `/chief` is detected in user input, the AI assistant **MUST** immediately e
 [User invokes /chief]
         │
         ▼
-1. LOAD INSTRUCTIONS ──► Read protocols/activation.md & SKILL.md
+1. LOAD SYSTEM PROMPT ──► Read core/system-prompt.md & core/config.md
         │
         ▼
-2. PARSE SKILL & GOVERNANCE ──► Read AGENTS.md (Root Directives)
+2. PARSE GOVERNANCE ────► Read SKILL.md & AGENTS.md (Root Directives)
         │
         ▼
-3. RESTORE MEMORY FILES ──► Ingest memory/chief/preferences.md
-        │                    Ingest memory/manager/project_state.md
-        │                    Ingest memory/manager/decisions.md (ADRs)
+3. RESTORE MEMORY ──────► Ingest memory/chief/preferences.md
+        │                 Ingest memory/manager/project_state.md
+        │                 Ingest memory/manager/decisions.md (ADRs)
         │
         ▼
-4. ADOPT CHIEF PERSONA ──► Apply agents/chief.md (<10 sentences, no code/logs)
+4. APPLY CONFIG ────────► Enforce communication style, length, and risk limits
         │
         ▼
-5. VERIFY RUNTIME STATE ──► Check runtime/current_agent.md & runtime/active_session.md
+5. VERIFY RUNTIME ──────► Check runtime/active_session.md
         │
         ▼
-6. EXECUTE LIFECYCLE ──► Delegate to Manager (agents/manager.md) via docs/lifecycle.md
+6. EXECUTE PIPELINE ────► Run 7-stage internal pipeline (docs/lifecycle.md)
 ```
 
 ### The 6 Mandatory Steps:
-1. **Load AI-Chief Instructions:** Ingest root rules and runtime operating bounds.
-2. **Read `SKILL.md`:** Anchor tool capabilities and entry-point directives.
-3. **Read `AGENTS.md` (if available):** Ensure root repository governance and constraints take precedence.
-4. **Restore Required Memory Files:**
+1. **Load AI-Chief System Prompt:** Ingest [`core/system-prompt.md`](file:///home/ishaan/Work/ai-chief/core/system-prompt.md) and user configuration in [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md).
+2. **Read `SKILL.md` & `AGENTS.md`:** Anchor root governance, operational constraints, and filesystem priority.
+3. **Restore Required Memory Files:**
    - [`memory/chief/preferences.md`](file:///home/ishaan/Work/ai-chief/memory/chief/preferences.md) (Tone, response length, human constraints).
    - [`memory/manager/project_state.md`](file:///home/ishaan/Work/ai-chief/memory/manager/project_state.md) (Current architecture and active milestones).
    - [`memory/manager/decisions.md`](file:///home/ishaan/Work/ai-chief/memory/manager/decisions.md) (Architectural Decision Records).
-5. **Enter Chief Mode:** Enforce the Chief persona ([`agents/chief.md`](file:///home/ishaan/Work/ai-chief/agents/chief.md)): speak concisely (<10 sentences), never code, never dump logs, and never expose internal agent protocol tags.
-6. **Process the Request Through the AI-Chief Lifecycle:** Route the user intent to the Manager Agent for context bounding and worker dispatch.
+4. **Apply Operational Bounds:** Adhere strictly to the communication style, sentence limits, and risk parameters in [`core/config.md`](file:///home/ishaan/Work/ai-chief/core/config.md).
+5. **Verify Runtime State:** Ensure runtime staging paths (`runtime/tasks/`, `runtime/active_session.md`) are initialized and clear of stale artifacts.
+6. **Process the Request Through the 7-Stage Pipeline:** Bound context, plan internally, execute modular changes, verify with tests, and emit the standard 4-field response (`Summary`, `Changes`, `Status`, `Next`).
 
 ---
 
 ## 4. Priority Rule
 **The filesystem has absolute priority over conversation history.**
-If past messages in the conversation contradict what is written in `AGENTS.md`, `memory/`, or `protocols/`, the AI **MUST** discard the conversational context and strictly obey the filesystem files.
+If past messages in the conversation contradict what is written in `core/system-prompt.md`, `AGENTS.md`, or `memory/`, the AI **MUST** discard the conversational context and strictly obey the filesystem files.
